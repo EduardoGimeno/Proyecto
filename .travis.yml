@@ -1,3 +1,11 @@
 language: java
 jdk:
   - oraclejdk8
+addons:
+  sonarcloud:
+    organization: unizar-30249-2018-major
+    token:
+      secure: gV1y+491MCq23rUZ0yv9gd8I5pLJoqPxjpZPirJO3GRA9zgt+2K5aNyHv/IRVVph0SL1EPtNFPPmB2p3JU23S8R8+6Lm3E7v0M0RDxWPbFppD/jINuKey3G7oGTw0AB1nXLCuE3uu4yYutX+9b6b9kCYVbZV26fD+i/FOS13F1PWgNe/KTKTXqFSBkp3ZnWu2aXThC5dojfMQ03XybNnAYhMiIuEfw55m1rroM4YtVrP0JA20nE/jN5SOU+RFD+dITLmVTb6mZ6xf/BXz+giEzl63RUbimPVPCsriVZiCjKYNbVXRM9MMplekxRKxZYyVDgcUi9v91qWxTpeahJ2qqvB89kO5fQ9udxXhj15FzCa6kz9d82pO8BY6gBBMxpJzVH4dwif4qWdAlHdkDz80RyyO0OpvZPZxRmSeo9tusEASQTUOSgaz2Tjr/RnekMg4ArMW0s5CCu4RXKwD0dR4OkisVFJ9Zod7sKYJZ5VyPXQN8YvZxdDO8OZgBQHKCLf80blu10OmhVOiVMGc/vNmzsRzi5VG6aY3Y66Z85Jw6TUrDEEkUtItvJ5RewxqTOk31CaNAepDyE9asjaU9cWdCJmH2iUu7ReiaM4IYnJNCh/gWLxhAhVIaiG43ZCAkrmb2LVZVUAYfWSAYZVX6yL1k2evhQUj22Gl1qrZRdp+Wc=
+script:
+#  - ./gradlew test jacocoTestReport
+  - sonar-scanner
