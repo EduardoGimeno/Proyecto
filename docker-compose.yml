@@ -1,0 +1,28 @@
+version: '3.4'
+services:
+  database:
+    image: 'mdillon/postgis'
+    volumes:
+      - postgis-data:/var/lib/postgresql
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=user
+    restart: on-failure
+
+  rabbitmq:
+    image: 'bitnami/rabbitmq:latest'
+    labels:
+      kompose.service.type: nodeport
+    ports:
+      - 4369:4369
+      - 5672:5672
+      - 25672:25672
+      - 15672:15672
+    volumes:
+      - 'rabbitmq_data:/bitnami'
+volumes:
+  postgis-data:
+  rabbitmq_data:
+    driver: local
