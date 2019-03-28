@@ -20,20 +20,55 @@ public class BookingController {
     UserRepository userRepository;
 
 
-    @PostMapping("/{id}/booking/create")
+    @PostMapping("/booking")
 
-    public String create(@PathVariable long id,@RequestBody Booking booking){
+    public String createNewBooking(@RequestParam("id") Long id,@RequestBody Booking booking){
         User user = userRepository.findById(id);
         Period period = new Period(booking.getPeriod().getstartDate(),booking.getPeriod().getEndDate());
-        bookingRepository.save(new Booking(booking.getIsPeriodic(), booking.getReason(),period, user));
+        Booking booking1 = new Booking(booking.getIsPeriodic(), booking.getReason(),period);
+        booking1.setUser(user);
+
+
+
+        bookingRepository.save(booking1);
 
         return "Booking is created";
 
     }
 
-    @GetMapping("/booking/findAll")
+    @GetMapping("/booking/{id}")
 
-    public List<Booking> findAll(){
+    public Booking getBookingById(@PathVariable Long id){
+
+        Booking booking = bookingRepository.findById(id);
+
+        return booking;
+
+    }
+
+    @PutMapping("/booking/{id}")
+    public String updateBooking(@PathVariable long id, @RequestBody Booking booking){
+
+        bookingRepository.setBookingInfoById(booking.getIsPeriodic(),booking.getReason(),booking.getPeriod().getEndDate(),booking.getPeriod().getstartDate(),id);
+
+        return "Booking is update";
+
+    }
+
+    @DeleteMapping("/booking/{id}")
+    public String deleteBooking(@PathVariable long id){
+
+        Booking booking = bookingRepository.findById(id);
+
+        bookingRepository.delete(booking);
+
+        return "Booking is deleted";
+
+    }
+
+    @GetMapping("/bookings")
+
+    public List<Booking> getAllBookings(){
 
         List<Booking> booking = bookingRepository.findAll();
 

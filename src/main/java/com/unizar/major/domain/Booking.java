@@ -14,8 +14,8 @@ import java.util.List;
 public class Booking {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    //@Column(name="idbooking")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name="id_booking")
     private long id;
 
     @Column(name="isperiodic")
@@ -24,8 +24,9 @@ public class Booking {
     @Column(name="reason")
     private String reason;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "iduser")
+    @JsonBackReference
     private User user;
 
 
@@ -48,7 +49,11 @@ public class Booking {
         this.user = user;
     }
 
-
+    public Booking(Boolean isPeriodic, String reason, Period period){
+        this.isPeriodic = isPeriodic;
+        this.reason=reason;
+        this.period = period;
+    }
     public Period getPeriod() {
         return period;
     }
@@ -58,12 +63,15 @@ public class Booking {
     }
 
 
-   /* public User getUser(){
+    public User getUser(){
         return user;
     }
     public void setUser(User user){
         this.user=user;
-    }*/
+        if(!user.getBookings().contains(this)){
+            user.setBookings(this);
+        }
+    }
 
     public long getId() {
         return id;

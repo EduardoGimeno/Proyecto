@@ -13,7 +13,7 @@ public class UserController {
     @Autowired
     UserRepository userRepository;
 
-    @PostMapping("/user/create")
+    @PostMapping("/user")
 
     public String create(@RequestBody User user){
 
@@ -23,15 +23,34 @@ public class UserController {
 
     }
 
-    @PostMapping("/user/delete/{id}")
 
-    public String delete(@PathVariable long id){
+    @GetMapping("/user/{id}")
 
-        User user = findById(id);
+    public User getUserById(@PathVariable long id){
+
+        User user = userRepository.findById(id);
+
+        return user;
+
+    }
+
+    @DeleteMapping("/user/{id}")
+    public String deleteUser(@PathVariable long id){
+
+        User user = userRepository.findById(id);
 
         userRepository.delete(user);
 
         return "User is deleted";
+
+    }
+
+    @PutMapping("/user/{id}")
+    public String updateUser(@PathVariable long id, @RequestBody User user){
+
+        userRepository.setUserInfoById(user.getFirstName(),user.getLastName(),user.getRol(),user.getNombreUsuario(),id);
+
+        return "User is update";
 
     }
 
@@ -61,7 +80,7 @@ public class UserController {
 
     }
 
-    @GetMapping("/user/findByFirstName/{firstName}")
+    @GetMapping("/user/findByFirstName{firstName}")
 
     public List<User> findByFirstName(@PathVariable String firstName){
 
@@ -77,14 +96,6 @@ public class UserController {
 
     }
 
-    @GetMapping("/user/findById/{id}")
 
-    public User findById(@PathVariable long id){
-
-        User user = userRepository.findById(id);
-
-        return user;
-
-    }
 
 }

@@ -1,7 +1,10 @@
 package com.unizar.major.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -24,6 +27,10 @@ public class User{
     @Column(name="nombreusuario")
     private String nombreUsuario;
 
+    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Booking> bookings;
+
 
     public User(){
 
@@ -36,13 +43,19 @@ public class User{
         this.nombreUsuario = nombreUsuario;
     }
 
-   /* public List<Booking> getBookings(){
+    public List<Booking> getBookings(){
         return bookings;
     }
 
     public void setBookings(Booking booking){
-        this.bookings.add(booking);
-    }*/
+        if (booking.getUser()==null){
+            booking.setUser(this);
+        }
+        if(!this.bookings.contains(booking)){
+            this.bookings.add(booking);
+        }
+
+    }
 
     public long getId() {
         return id;
