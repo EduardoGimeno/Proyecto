@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 public class UserController {
+
     @Autowired
     UserRepository userRepository;
 
@@ -28,9 +29,7 @@ public class UserController {
 
     public User getUserById(@PathVariable long id){
 
-        User user = userRepository.findById(id);
-
-        return user;
+        return userRepository.findById(id);
 
     }
 
@@ -58,9 +57,7 @@ public class UserController {
 
     public List<User> findAll(){
 
-        List<User> customers = userRepository.findAll();
-
-        return customers;
+        return userRepository.findAll();
 
     }
 
