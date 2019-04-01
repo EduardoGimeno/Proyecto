@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BookingService {
@@ -21,8 +22,8 @@ public class BookingService {
 
     public BookingService(){}
 
-    public String createNewBooking(long id, Booking booking){
-        User user = userRepository.findById(id);
+    public String createNewBooking(Long id, Booking booking){
+        User user = userRepository.findById(id).get();
         Period period = new Period(booking.getPeriod().getstartDate(),booking.getPeriod().getEndDate());
         Booking booking1 = new Booking(booking.getIsPeriodic(), booking.getReason(),period);
         booking1.setUser(user);
@@ -33,11 +34,9 @@ public class BookingService {
 
     }
 
-    public Booking getBookingById(long id){
+    public Optional<Booking> getBookingById(long id){
 
-        Booking booking = bookingRepository.findById(id);
-
-        return booking;
+        return bookingRepository.findById(id);
 
     }
 
@@ -51,9 +50,9 @@ public class BookingService {
 
     public String deleteBooking(long id){
 
-        Booking booking = bookingRepository.findById(id);
+        Optional<Booking> booking = bookingRepository.findById(id);
 
-        bookingRepository.delete(booking);
+        booking.ifPresent(booking1 -> bookingRepository.delete(booking1));
 
         return "Booking is deleted";
 

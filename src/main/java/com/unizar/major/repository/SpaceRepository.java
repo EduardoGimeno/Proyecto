@@ -5,10 +5,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface SpaceRepository extends JpaRepository<Space, String> {
+public interface SpaceRepository extends JpaRepository<Space, Long> {
     List<Space> findAll();
-    Space findById(Long id);
+    Optional<Space> findById(Long id);
 
 }

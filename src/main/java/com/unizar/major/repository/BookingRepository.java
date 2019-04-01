@@ -1,7 +1,6 @@
 package com.unizar.major.repository;
 
 import com.unizar.major.domain.Booking;
-import com.unizar.major.domain.Period;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -9,11 +8,12 @@ import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface BookingRepository extends JpaRepository<Booking, String> {
+public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findAll();
-    Booking findById(Long id);
+    Optional<Booking> findById(Long id);
 
     @Transactional
     @Modifying

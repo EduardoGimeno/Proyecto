@@ -1,10 +1,11 @@
 package com.unizar.major.service;
 
 import com.unizar.major.domain.User;
-import com.unizar.major.dtos.UserDto;
 import com.unizar.major.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 
 @Service
@@ -25,17 +26,16 @@ public class UserService {
 
     }
 
-    public User getUser (long id){
+    public Optional<User> getUser (long id){
         return userRepository.findById(id);
 
     }
 
     public String deleteUser(long id){
 
-        User user = userRepository.findById(id);
-
-        userRepository.delete(user);
-
+        Optional<User> user = userRepository.findById(id);
+        user.ifPresent(user1 -> userRepository.delete(user1));
+        // else 404
         return "User is deleted";
 
     }

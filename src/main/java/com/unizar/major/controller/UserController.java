@@ -7,8 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.text.ParseException;
-
-
+import java.util.Optional;
 
 
 @RestController
@@ -36,7 +35,7 @@ public class UserController {
     @GetMapping("/user/{id}")
 
     public UserDto getUserById(@PathVariable long id){
-        User u = userService.getUser(id);
+        Optional<User> u = userService.getUser(id);
         if (u == null){
             return null;
         }
@@ -73,7 +72,7 @@ public class UserController {
         return user;
     }
 
-    private UserDto convertDto(User user) {
+    private UserDto convertDto(Optional<User> user) {
         ModelMapper modelMapper = new ModelMapper();
         UserDto userDto = modelMapper.map(user, UserDto.class);
         return userDto;

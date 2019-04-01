@@ -9,7 +9,7 @@ public class Space {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name="spaceId")
-    private long id;
+    private Long id;
 
     @Column(name="plant")
     private String plant;
