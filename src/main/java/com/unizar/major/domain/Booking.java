@@ -85,7 +85,7 @@ public class Booking {
         return isPeriodic;
     }
 
-    public void setEsPeriodica(Boolean isPeriodic) {
+    public void setIsPeriodica(Boolean isPeriodic) {
         this.isPeriodic = isPeriodic;
     }
 

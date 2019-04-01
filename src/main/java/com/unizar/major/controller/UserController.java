@@ -1,97 +1,85 @@
 package com.unizar.major.controller;
 
 import com.unizar.major.domain.User;
-import com.unizar.major.repository.UserRepository;
+import com.unizar.major.dtos.UserDto;
+import com.unizar.major.service.UserService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import java.text.ParseException;
 
-import java.util.ArrayList;
-import java.util.List;
+
+
 
 @RestController
 public class UserController {
 
+
     @Autowired
-    UserRepository userRepository;
+    UserService userService;
 
     @PostMapping("/user")
 
-    public String create(@RequestBody User user){
+    public String create(@RequestBody UserDto userDto) {
 
-        userRepository.save(new User(user.getFirstName(), user.getLastName(),user.getRol(),user.getNombreUsuario()));
-
-        return "User is created";
+        User user = new User();
+        try {
+            user = convertToEntity(userDto);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return userService.createUser(user);
 
     }
 
 
     @GetMapping("/user/{id}")
 
-    public User getUserById(@PathVariable long id){
-
-        return userRepository.findById(id);
+    public UserDto getUserById(@PathVariable long id){
+        User u = userService.getUser(id);
+        if (u == null){
+            return null;
+        }
+        else {
+            return convertDto(u);
+        }
 
     }
 
     @DeleteMapping("/user/{id}")
     public String deleteUser(@PathVariable long id){
 
-        User user = userRepository.findById(id);
-
-        userRepository.delete(user);
-
-        return "User is deleted";
+        return userService.deleteUser(id);
 
     }
 
     @PutMapping("/user/{id}")
-    public String updateUser(@PathVariable long id, @RequestBody User user){
+    public String updateUser(@PathVariable long id, @RequestBody UserDto userDto){
 
-        userRepository.setUserInfoById(user.getFirstName(),user.getLastName(),user.getRol(),user.getNombreUsuario(),id);
-
-        return "User is update";
-
-    }
-
-    @GetMapping("/user/findAll")
-
-    public List<User> findAll(){
-
-        return userRepository.findAll();
-
-    }
-
-    @GetMapping("/user/findByRol/{rol}")
-
-    public List<User> findByRol(@PathVariable String rol){
-
-        List<User> userUI = new ArrayList<>();
-
-        List<User> users = userRepository.findByRol(rol);
-        for (User user: users){
-            userUI.add(new User(user.getFirstName(),user.getLastName(), user.getRol(), user.getNombreUsuario()));
-
+        User user = new User();
+        try {
+            user = convertToEntity(userDto);
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
-
-        return userUI;
-
-    }
-
-    @GetMapping("/user/findByFirstName{firstName}")
-
-    public List<User> findByFirstName(@PathVariable String firstName){
-
-        List<User> userUI = new ArrayList<>();
-
-        List<User> users = userRepository.findByFirstName(firstName);
-        for (User user: users){
-            userUI.add(new User(user.getFirstName(),user.getLastName(), user.getRol(),user.getNombreUsuario()));
-
-        }
-
-        return userUI;
+        return userService.updateUser(id,user);
 
     }
+
+
+    private User convertToEntity (UserDto userDto) throws ParseException {
+        ModelMapper modelMapper = new ModelMapper();
+        User user = modelMapper.map(userDto, User.class);
+        return user;
+    }
+
+    private UserDto convertDto(User user) {
+        ModelMapper modelMapper = new ModelMapper();
+        UserDto userDto = modelMapper.map(user, UserDto.class);
+        return userDto;
+    }
+
+
 
 
 
