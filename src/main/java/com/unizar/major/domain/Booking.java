@@ -1,13 +1,9 @@
 package com.unizar.major.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Table(name = "booking")
@@ -16,7 +12,7 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name="id_booking")
-    private long id;
+    private Long id;
 
     @Column(name="isperiodic")
     private Boolean isPeriodic;
@@ -73,11 +69,11 @@ public class Booking {
         }
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -85,7 +81,7 @@ public class Booking {
         return isPeriodic;
     }
 
-    public void setEsPeriodica(Boolean isPeriodic) {
+    public void setIsPeriodica(Boolean isPeriodic) {
         this.isPeriodic = isPeriodic;
     }
 
