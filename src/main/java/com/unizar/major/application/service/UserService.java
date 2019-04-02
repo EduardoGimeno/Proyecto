@@ -67,9 +67,18 @@ public class UserService {
     @Transactional
     public String updateUser(long id, User user){
 
-        userRepository.setUserInfoById(user.getFirstName(),user.getLastName(),user.getRol(),user.getNombreUsuario(),id);
+        Optional<User> u = userRepository.findById(id);
+        if (u.isPresent()){
+            userRepository.setUserInfoById(user.getFirstName(),user.getLastName(),user.getRol(),user.getNombreUsuario(),id);
+            return "User is update";
+        }
+        else{
+            return "User not exist";
+        }
 
-        return "User is update";
+
+
+
 
     }
 

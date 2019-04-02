@@ -57,9 +57,18 @@ public class BookingService {
     @Transactional
     public String updateBooking(long id, Booking booking){
 
-        bookingRepository.setBookingInfoById(booking.getIsPeriodic(),booking.getReason(),booking.getPeriod().getEndDate(),booking.getPeriod().getstartDate(),id);
+        Optional<Booking> b =bookingRepository.findById(id);
+        if (b.isPresent()){
+            bookingRepository.setBookingInfoById(booking.getIsPeriodic(),booking.getReason(),booking.getPeriod().getEndDate(),booking.getPeriod().getstartDate(),id);
+            return "Booking is update";
+        }
+        else{
+            return "Booking not exists";
+        }
 
-        return "Booking is update";
+
+
+
 
     }
 
