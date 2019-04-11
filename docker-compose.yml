@@ -4,6 +4,7 @@ services:
     image: 'mdillon/postgis:10'
     volumes:
       - postgis-data:/var/lib/postgresql
+      - ./DB_init:/docker-entrypoint-initdb.d
     ports:
       - 5432:5432
     environment:
