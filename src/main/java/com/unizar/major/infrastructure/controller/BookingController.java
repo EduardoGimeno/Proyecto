@@ -1,8 +1,8 @@
-package com.unizar.major.controller;
+package com.unizar.major.infrastructure.controller;
 
 import com.unizar.major.domain.Booking;
-import com.unizar.major.dtos.BookingDto;
-import com.unizar.major.service.BookingService;
+import com.unizar.major.application.dtos.BookingDto;
+import com.unizar.major.application.service.BookingService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -36,12 +36,12 @@ public class BookingController {
 
     public BookingDto getBookingById(@PathVariable Long id){
 
-        Optional<Booking> b = bookingService.getBookingById(id);
+       Optional <Booking> b = bookingService.getBookingById(id);
         if (b == null){
             return null;
         }
         else {
-            return convertDto(b);
+            return convertDto(b.get());
         }
 
 
@@ -75,7 +75,7 @@ public class BookingController {
         List<BookingDto> bookingDtos = new ArrayList<>();
 
         for (Booking b : booking) {
-            bookingDtos.add(convertDto(Optional.ofNullable(b)));
+            bookingDtos.add(convertDto(b));
         }
 
         return bookingDtos;
@@ -88,7 +88,7 @@ public class BookingController {
         return booking;
     }
 
-    private BookingDto convertDto(Optional<Booking> booking) {
+    private BookingDto convertDto(Booking booking) {
         ModelMapper modelMapper = new ModelMapper();
         BookingDto bookingDto = modelMapper.map(booking, BookingDto.class);
         return bookingDto;

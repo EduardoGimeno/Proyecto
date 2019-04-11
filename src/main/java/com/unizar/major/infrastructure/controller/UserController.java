@@ -1,12 +1,18 @@
-package com.unizar.major.controller;
+package com.unizar.major.infrastructure.controller;
 
+import com.unizar.major.application.dtos.BookingDto;
+import com.unizar.major.domain.Booking;
 import com.unizar.major.domain.User;
-import com.unizar.major.dtos.UserDto;
-import com.unizar.major.service.UserService;
+import com.unizar.major.application.dtos.UserDto;
+import com.unizar.major.application.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.awt.print.Book;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -35,12 +41,12 @@ public class UserController {
     @GetMapping("/user/{id}")
 
     public UserDto getUserById(@PathVariable long id){
-        Optional<User> u = userService.getUser(id);
+       Optional<User> u = userService.getUser(id);
         if (u == null){
             return null;
         }
         else {
-            return convertDto(u);
+            return convertDto(u.get());
         }
 
     }
@@ -65,6 +71,24 @@ public class UserController {
 
     }
 
+    @GetMapping("/user/{id}/bookings")
+
+    public List<BookingDto> getUserBookingsById(@PathVariable long id){
+        List<Booking> booking = userService.getBookings(id);
+        if (booking == null){
+            return null;
+        }
+        else {
+            List<BookingDto> bookingDtos = new ArrayList<>();
+
+            for (Booking b : booking) {
+                bookingDtos.add(convertDto(b));
+            }
+            return bookingDtos;
+        }
+
+    }
+
 
     private User convertToEntity (UserDto userDto) throws ParseException {
         ModelMapper modelMapper = new ModelMapper();
@@ -72,10 +96,16 @@ public class UserController {
         return user;
     }
 
-    private UserDto convertDto(Optional<User> user) {
+    private UserDto convertDto(User user) {
         ModelMapper modelMapper = new ModelMapper();
         UserDto userDto = modelMapper.map(user, UserDto.class);
         return userDto;
+    }
+
+    private BookingDto convertDto(Booking booking) {
+        ModelMapper modelMapper = new ModelMapper();
+        BookingDto bookingDto = modelMapper.map(booking, BookingDto.class);
+        return bookingDto;
     }
 
 

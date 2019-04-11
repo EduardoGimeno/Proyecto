@@ -1,4 +1,4 @@
-package com.unizar.major.repository;
+package com.unizar.major.domain.repository;
 
 import com.unizar.major.domain.Space;
 import org.springframework.data.jpa.repository.JpaRepository;

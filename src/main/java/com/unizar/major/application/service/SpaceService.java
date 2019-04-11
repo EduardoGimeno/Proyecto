@@ -1,4 +1,4 @@
-package com.unizar.major.service;
+package com.unizar.major.application.service;
 
 import org.springframework.stereotype.Service;
 

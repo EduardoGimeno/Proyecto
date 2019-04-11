@@ -1,4 +1,4 @@
-package com.unizar.major.repository;
+package com.unizar.major.domain.repository;
 
 import com.unizar.major.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,13 +11,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
-    List<User> findByFirstName (String FirstName);
+public interface UserRepository extends JpaRepository<User, String> {
+
     List<User> findAll();
-    List<User> findByRol (String rol);
     Optional<User> findById(Long id);
 
-    @Transactional
+
     @Modifying
     @Query("update User u set u.firstName =?1, u.lastName=?2, u.rol=?3, u.nombreUsuario=?4 where u.id=?5")
     void setUserInfoById(String firstName,String lastName, String rol, String nombreUsuario, Long id);

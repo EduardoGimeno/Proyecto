@@ -1,4 +1,4 @@
-package com.unizar.major.dtos;
+package com.unizar.major.application.dtos;
 
 
 import com.unizar.major.domain.Period;

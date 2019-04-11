@@ -1,4 +1,4 @@
-package com.unizar.major.configuration;
+package com.unizar.major.infrastructure.configuration;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ import java.util.Properties;
 
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(basePackages = "com.unizar.major.repository")
+@EnableJpaRepositories(basePackages = "com.unizar.major.domain.repository")
 public class JpaConfig {
 
     @Autowired

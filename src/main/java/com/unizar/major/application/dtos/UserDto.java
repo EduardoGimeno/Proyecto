@@ -1,6 +1,7 @@
-package com.unizar.major.dtos;
+package com.unizar.major.application.dtos;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.unizar.major.domain.Booking;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class UserDto {
 
     private String nombreUsuario;
 
+    @JsonIgnore
     private List<Booking> bookings;
 
     public long getId() {
