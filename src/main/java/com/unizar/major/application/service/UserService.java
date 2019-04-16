@@ -1,5 +1,6 @@
 package com.unizar.major.application.service;
 
+import com.unizar.major.application.dtos.UserDto;
 import com.unizar.major.domain.Booking;
 import com.unizar.major.domain.User;
 import com.unizar.major.domain.repository.UserRepository;
@@ -22,9 +23,12 @@ public class UserService {
     }
 
     @Transactional
-    public String createUser(User user) {
+    public String createUser(UserDto userDto) {
 
-        User user1 = userRepository.save(new User(user.getFirstName(), user.getLastName(), user.getRol(), user.getNombreUsuario()));
+        User user1 = new User(userDto.getFirstName(), userDto.getLastName(), "estudiante", userDto.getNombreUsuario());
+        user1.setActive(true);
+        userRepository.save(user1);
+
         Optional<User> user_2 = userRepository.findById(user1.getId());
         if (user_2.isPresent()) {
             return "User "+ user_2.get().getNombreUsuario() +" is created";
@@ -53,7 +57,8 @@ public class UserService {
 
         if (user.isPresent()) {
             User u = user.get();
-            userRepository.delete(u);
+            u.setActive(false);
+            userRepository.save(u);
             return "User "+ user.get().getNombreUsuario()+" is deleted";
         }
         else {
@@ -65,11 +70,15 @@ public class UserService {
     }
 
     @Transactional
-    public String updateUser(long id, User user){
+    public String updateUser(long id, UserDto userDto){
 
         Optional<User> u = userRepository.findById(id);
         if (u.isPresent()){
-            userRepository.setUserInfoById(user.getFirstName(),user.getLastName(),user.getRol(),user.getNombreUsuario(),id);
+            User user = u.get();
+            user.setFirstName(userDto.getFirstName());
+            user.setLastName(userDto.getLastName());
+            user.setNombreUsuario(userDto.getNombreUsuario());
+            userRepository.save(user);
             return "User is update";
         }
         else{

@@ -8,30 +8,30 @@ import java.util.Date;
 public class Period {
 
 
-    private String startDate;
+    private Date startDate;
 
-    private String endDate;
+    private Date endDate;
 
     public Period(){}
 
-    public Period(String startDate, String endDate){
+    public Period(Date startDate, Date endDate){
         this.startDate = startDate;
         this.endDate = endDate;
     }
 
-    public String getstartDate() {
+    public Date getstartDate() {
         return startDate;
     }
 
-    public void setstartDate(String startDate) {
+    public void setstartDate(Date startDate) {
         this.startDate = startDate;
     }
 
-    public String getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(String endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 

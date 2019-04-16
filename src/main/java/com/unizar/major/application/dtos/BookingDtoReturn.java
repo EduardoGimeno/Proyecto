@@ -1,20 +1,22 @@
 package com.unizar.major.application.dtos;
 
-
 import com.unizar.major.domain.Period;
+
+import java.util.Collection;
 import java.util.Date;
 
-
-public class BookingDto {
-
-
+public class BookingDtoReturn {
     private long id;
 
     private boolean isPeriodic;
 
     private String reason;
 
-    private Period period;
+    private Collection<Period> period;
+
+    private String state;
+
+    private boolean active;
 
     private String periodRep;
 
@@ -29,7 +31,7 @@ public class BookingDto {
         this.id = id;
     }
 
-    public boolean isIsPeriodic() {
+    public boolean getIsPeriodic() {
         return isPeriodic;
     }
 
@@ -45,11 +47,11 @@ public class BookingDto {
         this.reason = reason;
     }
 
-    public Period getPeriod() {
+    public Collection<Period> getPeriod() {
         return period;
     }
 
-    public void setPeriod(Period period) {
+    public void setPeriod(Collection<Period> period) {
         this.period=period;
     }
 
@@ -67,5 +69,21 @@ public class BookingDto {
 
     public void setFinalDate(Date finalDate) {
         this.finalDate = finalDate;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

@@ -32,6 +32,9 @@ public class User{
     @JsonManagedReference
     private List<Booking> bookings;
 
+    @Column(name="active")
+    private boolean active;
+
 
     public User(){
 
@@ -96,5 +99,13 @@ public class User{
 
     public void setNombreUsuario(String nombreUsuario){
         this.nombreUsuario = nombreUsuario;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

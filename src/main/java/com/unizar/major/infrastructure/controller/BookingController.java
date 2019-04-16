@@ -1,9 +1,14 @@
 package com.unizar.major.infrastructure.controller;
 
+import com.unizar.major.application.dtos.BookingDtoReturn;
+import com.unizar.major.application.service.UserService;
 import com.unizar.major.domain.Booking;
 import com.unizar.major.application.dtos.BookingDto;
 import com.unizar.major.application.service.BookingService;
+import com.unizar.major.domain.User;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,24 +22,54 @@ public class BookingController {
     @Autowired
     BookingService bookingService;
 
+    @Autowired
+    UserService userService;
+
+    Logger logger = LoggerFactory.getLogger(BookingService.class);
 
     @PostMapping("/booking")
 
     public String createNewBooking(@RequestParam("id") Long id,@RequestBody BookingDto bookingDto){
 
-        Booking booking = new Booking();
-        try {
-            booking = convertToEntity(bookingDto);
-        } catch (ParseException e) {
-            e.printStackTrace();
+        Optional <User> u = userService.getUser(id);
+
+        if (u == null){
+            return "User not exists";
         }
-        return bookingService.createNewBooking(id,booking);
+        else{
+            if (u.get().isActive()){
+
+                if (bookingDto.getPeriod().getstartDate().compareTo(bookingDto.getPeriod().getEndDate())>0){
+                    return "Error, period is incorrect";
+                }
+                else{
+
+                    if (!bookingDto.isIsPeriodic()){
+                        return bookingService.createNewBooking(id,bookingDto);
+                    }
+                    else{
+                        if (bookingDto.getFinalDate().compareTo(bookingDto.getPeriod().getEndDate())<0) {
+                            return "Error, finalDate is incorrect";
+                        }
+                        else {
+                            return bookingService.createNewBookingPeriodic(id, bookingDto);
+                        }
+                    }
+                }
+
+            }
+            else{
+                return "User is not active in the system";
+            }
+
+        }
+
 
     }
 
     @GetMapping("/booking/{id}")
 
-    public BookingDto getBookingById(@PathVariable Long id){
+    public BookingDtoReturn getBookingById(@PathVariable Long id){
 
        Optional <Booking> b = bookingService.getBookingById(id);
         if (b == null){
@@ -50,14 +85,7 @@ public class BookingController {
     @PutMapping("/booking/{id}")
     public String updateBooking(@PathVariable long id, @RequestBody BookingDto bookingDto){
 
-        Booking booking = new Booking();
-        try {
-            booking = convertToEntity(bookingDto);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        return bookingService.updateBooking(id, booking);
+        return bookingService.updateBooking(id, bookingDto);
     }
 
     @DeleteMapping("/booking/{id}")
@@ -69,16 +97,16 @@ public class BookingController {
 
     @GetMapping("/bookings")
 
-    public List<BookingDto> getAllBookings(){
+    public List<BookingDtoReturn> getAllBookings(){
 
         List<Booking> booking = bookingService.getAllBookings();
-        List<BookingDto> bookingDtos = new ArrayList<>();
+        List<BookingDtoReturn> bookingDtosReturn = new ArrayList<>();
 
         for (Booking b : booking) {
-            bookingDtos.add(convertDto(b));
+            bookingDtosReturn.add(convertDto(b));
         }
 
-        return bookingDtos;
+        return bookingDtosReturn;
 
     }
 
@@ -88,10 +116,11 @@ public class BookingController {
         return booking;
     }
 
-    private BookingDto convertDto(Booking booking) {
+    private BookingDtoReturn convertDto(Booking booking) {
         ModelMapper modelMapper = new ModelMapper();
-        BookingDto bookingDto = modelMapper.map(booking, BookingDto.class);
-        return bookingDto;
+        BookingDtoReturn bookingDtoReturn = modelMapper.map(booking, BookingDtoReturn.class);
+
+        return bookingDtoReturn;
     }
 
 }

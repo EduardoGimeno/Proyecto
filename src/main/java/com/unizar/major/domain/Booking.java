@@ -3,7 +3,9 @@ package com.unizar.major.domain;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import javax.persistence.*;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
 
 @Entity
 @Table(name = "booking")
@@ -15,7 +17,7 @@ public class Booking {
     private Long id;
 
     @Column(name="isperiodic")
-    private Boolean isPeriodic;
+    private boolean isPeriodic;
 
     @Column(name="reason")
     private String reason;
@@ -26,36 +28,47 @@ public class Booking {
     private User user;
 
 
+    @ElementCollection
+    @CollectionTable(name="Booking_Period", joinColumns = @JoinColumn(name="id_booking"))
+    private Collection<Period> periods = new ArrayList<>();
 
-    @Embedded
-    @AttributeOverrides(value= {
-            @AttributeOverride(name="startDate", column = @Column(name="startDate")),
-            @AttributeOverride(name="endDate", column = @Column(name="endDate"))
-    })
-    private Period period;
+    @Column(name="state")
+    private String state;
+
+    @Column(name="active")
+    private boolean active;
+
+    @Column(name="periodRep")
+    private String periodRep;
+
+    @Column(name="finalDate")
+    private Date finalDate;
+
+
 
     public Booking(){
 
     }
 
-    public Booking(Boolean isPeriodic, String reason, Period period, User user){
+    public Booking(boolean isPeriodic, String reason, Collection<Period> periods){
         this.isPeriodic = isPeriodic;
         this.reason=reason;
-        this.period = period;
-        this.user = user;
+        this.periods = periods;
     }
 
-    public Booking(Boolean isPeriodic, String reason, Period period){
+    public Booking(boolean isPeriodic, String reason, Collection<Period> periods, String periodRep, Date finalDate){
         this.isPeriodic = isPeriodic;
         this.reason=reason;
-        this.period = period;
+        this.periods = periods;
+        this.periodRep = periodRep;
+        this.finalDate = finalDate;
     }
-    public Period getPeriod() {
-        return period;
+    public Collection<Period> getPeriod() {
+        return this.periods;
     }
 
-    public void setPeriod(Period period) {
-        this.period = period;
+    public void setPeriod(Collection<Period> period) {
+        this.periods = period;
     }
 
 
@@ -77,11 +90,11 @@ public class Booking {
         this.id = id;
     }
 
-    public Boolean getIsPeriodic() {
+    public boolean isIsPeriodic() {
         return isPeriodic;
     }
 
-    public void setIsPeriodica(Boolean isPeriodic) {
+    public void setIsPeriodic(boolean isPeriodic) {
         this.isPeriodic = isPeriodic;
     }
 
@@ -93,9 +106,35 @@ public class Booking {
         this.reason = motivo;
     }
 
+    public String getState() {
+        return state;
+    }
 
+    public void setState(String state) {
+        this.state = state;
+    }
 
+    public boolean isActive() {
+        return active;
+    }
 
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 
+    public String getPeriodRep() {
+        return periodRep;
+    }
 
+    public void setPeriodRep(String periodRep) {
+        this.periodRep = periodRep;
+    }
+
+    public Date getFinalDate() {
+        return finalDate;
+    }
+
+    public void setFinalDate(Date finalDate) {
+        this.finalDate = finalDate;
+    }
 }
