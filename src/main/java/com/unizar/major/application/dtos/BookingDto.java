@@ -20,6 +20,8 @@ public class BookingDto {
 
     private Date finalDate;
 
+    private boolean Especial;
+
 
     public long getId() {
         return id;
@@ -67,5 +69,13 @@ public class BookingDto {
 
     public void setFinalDate(Date finalDate) {
         this.finalDate = finalDate;
+    }
+
+    public boolean isEspecial() {
+        return Especial;
+    }
+
+    public void setEspecial(boolean especial) {
+        Especial = especial;
     }
 }

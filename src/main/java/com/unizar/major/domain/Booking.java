@@ -44,6 +44,9 @@ public class Booking {
     @Column(name="finalDate")
     private Date finalDate;
 
+    @Column(name="especial")
+    private boolean especial;
+
 
 
     public Booking(){
@@ -136,5 +139,13 @@ public class Booking {
 
     public void setFinalDate(Date finalDate) {
         this.finalDate = finalDate;
+    }
+
+    public boolean isEspecial() {
+        return especial;
+    }
+
+    public void setEspecial(boolean especial) {
+        this.especial = especial;
     }
 }

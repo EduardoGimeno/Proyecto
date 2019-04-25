@@ -46,6 +46,13 @@ public class BookingService {
             booking.setPeriodRep(null);
             booking.setUser(u);
 
+            if (u.getRol() == "admin"){
+                booking.setEspecial(bookingDto.isEspecial());
+            }
+            else{
+                booking.setEspecial(false);
+            }
+
             bookingRepository.save(booking);
         }
         else{
@@ -61,13 +68,26 @@ public class BookingService {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()){
             User u = user.get();
-            Collection<Period> p = calculatePeriods(bookingDto.getPeriodRep(), bookingDto.getFinalDate(),bookingDto.getPeriod().getstartDate(),bookingDto.getPeriod().getEndDate());
-            Booking booking = new Booking(bookingDto.isIsPeriodic(), bookingDto.getReason(),p, bookingDto.getPeriodRep(), bookingDto.getFinalDate());
-            booking.setActive(true);
-            booking.setState("inicial");
-            booking.setUser(u);
+            if (u.getRol() == "admin" || u.getRol()=="pdi"){
+                Collection<Period> p = calculatePeriods(bookingDto.getPeriodRep(), bookingDto.getFinalDate(),bookingDto.getPeriod().getstartDate(),bookingDto.getPeriod().getEndDate());
+                Booking booking = new Booking(bookingDto.isIsPeriodic(), bookingDto.getReason(),p, bookingDto.getPeriodRep(), bookingDto.getFinalDate());
+                booking.setActive(true);
+                booking.setState("inicial");
+                booking.setUser(u);
 
-            bookingRepository.save(booking);
+                if (u.getRol() == "admin"){
+                    booking.setEspecial(bookingDto.isEspecial());
+                }
+                else{
+                    booking.setEspecial(false);
+                }
+
+                bookingRepository.save(booking);
+            }
+            else{
+               return "User student don't have permission to create booking periodic";
+            }
+
         }
         else{
             return "User with id "+ id + "not exist";

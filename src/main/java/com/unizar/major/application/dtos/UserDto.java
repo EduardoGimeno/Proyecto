@@ -17,7 +17,11 @@ public class UserDto {
 
     private String rol;
 
-    private String nombreUsuario;
+    private String nameUser;
+
+    private String email;
+
+    private String password;
 
     @JsonIgnore
     private List<Booking> bookings;
@@ -54,12 +58,12 @@ public class UserDto {
         this.rol = rol;
     }
 
-    public String getNombreUsuario() {
-        return nombreUsuario;
+    public String getNameUser() {
+        return nameUser;
     }
 
-    public void setNombreUsuario(String nombreUsuario) {
-        this.nombreUsuario = nombreUsuario;
+    public void setNameUser(String nameUser) {
+        this.nameUser = nameUser;
     }
 
     public List<Booking> getBookings() {
@@ -68,5 +72,21 @@ public class UserDto {
 
     public void setBookings(List<Booking> bookings) {
         this.bookings = bookings;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

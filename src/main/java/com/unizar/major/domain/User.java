@@ -1,11 +1,9 @@
 package com.unizar.major.domain;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -26,7 +24,10 @@ public class User{
     private String rol;
 
     @Column(name="nombreusuario")
-    private String nombreUsuario;
+    private String nameUser;
+
+    @Column(name="email")
+    private String email;
 
     @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
     @JsonManagedReference
@@ -35,16 +36,21 @@ public class User{
     @Column(name="active")
     private boolean active;
 
+    @Column(name="password")
+    private String password;
+
 
     public User(){
 
     }
 
-    public User(String firstName, String lastName, String rol, String nombreUsuario){
+    public User(String firstName, String lastName, String rol, String nameuser, String email, String password){
         this.firstName=firstName;
         this.lastName = lastName;
         this.rol = rol;
-        this.nombreUsuario = nombreUsuario;
+        this.nameUser = nameuser;
+        this.email = email;
+        this.password = password;
     }
 
     public List<Booking> getBookings(){
@@ -93,12 +99,12 @@ public class User{
         this.rol = rol;
     }
 
-    public String getNombreUsuario(){
-        return nombreUsuario;
+    public String getNameUser(){
+        return nameUser;
     }
 
-    public void setNombreUsuario(String nombreUsuario){
-        this.nombreUsuario = nombreUsuario;
+    public void setNameUser(String nameUser){
+        this.nameUser = nameUser;
     }
 
     public boolean isActive() {
@@ -107,5 +113,21 @@ public class User{
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

@@ -1,12 +1,15 @@
 package com.unizar.major.infrastructure.controller;
 
-import com.unizar.major.application.dtos.BookingDto;
 import com.unizar.major.application.dtos.BookingDtoReturn;
+import com.unizar.major.application.dtos.LoginDto;
+import com.unizar.major.application.service.BookingService;
 import com.unizar.major.domain.Booking;
 import com.unizar.major.domain.User;
 import com.unizar.major.application.dtos.UserDto;
 import com.unizar.major.application.service.UserService;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,11 +27,64 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    Logger logger = LoggerFactory.getLogger(BookingService.class);
+
+
+    @PostMapping("/user/login")
+    public String loginUser(@RequestBody LoginDto loginDto){
+
+        if (loginDto.getLogin().isEmpty()){
+            return "enter a username or email";
+        }
+        else if (loginDto.getPassword().isEmpty()){
+            return "enter your password";
+        }
+        else{
+            return userService.loginUser(loginDto);
+        }
+
+    }
+
     @PostMapping("/user")
+    public String createUser(@RequestParam(value="id", required=false) long id, @RequestBody UserDto userDto) {
 
-    public String createUser(@RequestBody UserDto userDto) {
+        String email = userDto.getEmail();
+        String unizar = "unizar.es";
+        int pos = email.indexOf("@");
+        String caracteres = email.substring(pos+1);
 
-        return userService.createUser(userDto);
+        logger.info(caracteres);
+        logger.info(userDto.getEmail());
+
+        if (caracteres.compareTo(unizar)==0){
+            if (userDto.getFirstName().length()<=20){
+                if (userDto.getLastName().length()<=20){
+                    if (userDto.getNameUser().length()<=20){
+                        if (userDto.getPassword().length()>=8){
+                            return userService.createUser(id,userDto);
+                        }
+                        else{
+                            return "Password not be equal or greater than 8 characters";
+                        }
+
+                    }
+                    else{
+                        return "Name user not be more than 20 characters";
+                    }
+
+                }
+                else{
+                    return "LastName not be more than 20 characters";
+                }
+            }
+            else{
+                return "FirstName not be more than 20 characters";
+            }
+        }
+        else{
+            return "Email incorrect, not is @unizar.es";
+        }
+
 
     }
 

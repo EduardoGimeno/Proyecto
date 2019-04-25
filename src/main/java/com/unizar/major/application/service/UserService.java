@@ -1,13 +1,16 @@
 package com.unizar.major.application.service;
 
+import com.unizar.major.application.dtos.LoginDto;
 import com.unizar.major.application.dtos.UserDto;
 import com.unizar.major.domain.Booking;
 import com.unizar.major.domain.User;
 import com.unizar.major.domain.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 
 import javax.transaction.Transactional;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,18 +26,35 @@ public class UserService {
     }
 
     @Transactional
-    public String createUser(UserDto userDto) {
+    public String createUser(long id,UserDto userDto) {
+        String password_encript="";
 
-        User user1 = new User(userDto.getFirstName(), userDto.getLastName(), "estudiante", userDto.getNombreUsuario());
-        user1.setActive(true);
-        userRepository.save(user1);
+        try{
+            byte[] data = userDto.getPassword().getBytes("UTF-8");
+            password_encript = DigestUtils.md5DigestAsHex(data);
+        }catch(UnsupportedEncodingException e){
+            e.printStackTrace();
+        }
+
+        Optional<User> user = userRepository.findById(id);
+        User user1;
+        if (user.isPresent() && user.get().getRol()=="admin"){
+            user1 = new User(userDto.getFirstName(), userDto.getLastName(), userDto.getRol(), userDto.getNameUser(), userDto.getEmail(),password_encript);
+            user1.setActive(true);
+            userRepository.save(user1);
+        }
+        else{
+            user1 = new User(userDto.getFirstName(), userDto.getLastName(), "estudiante", userDto.getNameUser(), userDto.getEmail(),password_encript);
+            user1.setActive(true);
+            userRepository.save(user1);
+        }
 
         Optional<User> user_2 = userRepository.findById(user1.getId());
         if (user_2.isPresent()) {
-            return "User "+ user_2.get().getNombreUsuario() +" is created";
+            return "User "+ user_2.get().getNameUser() +" is created";
         }
         else {
-            return "User "+ user_2.get().getNombreUsuario()+" is not created";
+            return "User "+ user_2.get().getNameUser()+" is not created";
         }
 
     }
@@ -59,7 +79,11 @@ public class UserService {
             User u = user.get();
             u.setActive(false);
             userRepository.save(u);
-            return "User "+ user.get().getNombreUsuario()+" is deleted";
+            for (Booking b : u.getBookings()) {
+                b.setActive(false);
+            }
+
+            return "User "+ user.get().getNameUser()+" is deleted";
         }
         else {
             return "User not exist";
@@ -77,7 +101,7 @@ public class UserService {
             User user = u.get();
             user.setFirstName(userDto.getFirstName());
             user.setLastName(userDto.getLastName());
-            user.setNombreUsuario(userDto.getNombreUsuario());
+            user.setNameUser(userDto.getNameUser());
             userRepository.save(user);
             return "User is update";
         }
@@ -102,4 +126,28 @@ public class UserService {
         }
 
     }
+
+    public String loginUser(LoginDto loginDto) {
+
+        Optional<User> user = userRepository.findByNameUser(loginDto.getLogin());
+        if (user.isPresent()){
+            String password_encript="";
+            try{
+                byte[] data = loginDto.getPassword().getBytes("UTF-8");
+                password_encript = DigestUtils.md5DigestAsHex(data);
+            }catch(UnsupportedEncodingException e){
+                e.printStackTrace();
+            }
+            if (user.get().getPassword().compareTo(password_encript)==0){
+                return "login";
+            }
+            else{
+                return "Password is incorrect";
+            }
+        }
+        else{
+            return "Name of user is incorrect";
+        }
+    }
+
 }
