@@ -24,7 +24,7 @@ public class User{
     private String rol;
 
     @Column(name="nombreusuario")
-    private String nameUser;
+    private String userName;
 
     @Column(name="email")
     private String email;
@@ -48,7 +48,7 @@ public class User{
         this.firstName=firstName;
         this.lastName = lastName;
         this.rol = rol;
-        this.nameUser = nameuser;
+        this.userName = nameuser;
         this.email = email;
         this.password = password;
     }
@@ -99,12 +99,12 @@ public class User{
         this.rol = rol;
     }
 
-    public String getNameUser(){
-        return nameUser;
+    public String getUserName(){
+        return userName;
     }
 
-    public void setNameUser(String nameUser){
-        this.nameUser = nameUser;
+    public void setUserName(String userName){
+        this.userName = userName;
     }
 
     public boolean isActive() {

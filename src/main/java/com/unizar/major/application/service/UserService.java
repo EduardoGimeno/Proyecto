@@ -39,22 +39,22 @@ public class UserService {
         Optional<User> user = userRepository.findById(id);
         User user1;
         if (user.isPresent() && user.get().getRol()=="admin"){
-            user1 = new User(userDto.getFirstName(), userDto.getLastName(), userDto.getRol(), userDto.getNameUser(), userDto.getEmail(),password_encript);
+            user1 = new User(userDto.getFirstName(), userDto.getLastName(), userDto.getRol(), userDto.getUserName(), userDto.getEmail(),password_encript);
             user1.setActive(true);
             userRepository.save(user1);
         }
         else{
-            user1 = new User(userDto.getFirstName(), userDto.getLastName(), "estudiante", userDto.getNameUser(), userDto.getEmail(),password_encript);
+            user1 = new User(userDto.getFirstName(), userDto.getLastName(), "estudiante", userDto.getUserName(), userDto.getEmail(),password_encript);
             user1.setActive(true);
             userRepository.save(user1);
         }
 
         Optional<User> user_2 = userRepository.findById(user1.getId());
         if (user_2.isPresent()) {
-            return "User "+ user_2.get().getNameUser() +" is created";
+            return "User "+ user_2.get().getUserName() +" is created";
         }
         else {
-            return "User "+ user_2.get().getNameUser()+" is not created";
+            return "User "+ user_2.get().getUserName()+" is not created";
         }
 
     }
@@ -83,7 +83,7 @@ public class UserService {
                 b.setActive(false);
             }
 
-            return "User "+ user.get().getNameUser()+" is deleted";
+            return "User "+ user.get().getUserName()+" is deleted";
         }
         else {
             return "User not exist";
@@ -101,7 +101,9 @@ public class UserService {
             User user = u.get();
             user.setFirstName(userDto.getFirstName());
             user.setLastName(userDto.getLastName());
-            user.setNameUser(userDto.getNameUser());
+            user.setUserName(userDto.getUserName());
+            user.setEmail(userDto.getEmail());
+            user.setPassword(userDto.getPassword());
             userRepository.save(user);
             return "User is update";
         }
@@ -129,7 +131,7 @@ public class UserService {
 
     public String loginUser(LoginDto loginDto) {
 
-        Optional<User> user = userRepository.findByNameUser(loginDto.getLogin());
+        Optional<User> user = userRepository.findByUserName(loginDto.getLogin());
         if (user.isPresent()){
             String password_encript="";
             try{

@@ -7,6 +7,7 @@ import com.unizar.major.domain.Booking;
 import com.unizar.major.domain.User;
 import com.unizar.major.application.dtos.UserDto;
 import com.unizar.major.application.service.UserService;
+import com.unizar.major.domain.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,9 @@ public class UserController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    UserRepository userRepository;
 
     Logger logger = LoggerFactory.getLogger(BookingService.class);
 
@@ -59,9 +63,14 @@ public class UserController {
         if (caracteres.compareTo(unizar)==0){
             if (userDto.getFirstName().length()<=20){
                 if (userDto.getLastName().length()<=20){
-                    if (userDto.getNameUser().length()<=20){
+                    if (userDto.getUserName().length()<=20){
                         if (userDto.getPassword().length()>=8){
-                            return userService.createUser(id,userDto);
+                            if (!userRepository.findByUserName(userDto.getUserName()).isPresent()){
+                                return userService.createUser(id,userDto);
+                            }
+                            else{
+                                return "Username already exist in the system";
+                            }
                         }
                         else{
                             return "Password not be equal or greater than 8 characters";
@@ -69,7 +78,7 @@ public class UserController {
 
                     }
                     else{
-                        return "Name user not be more than 20 characters";
+                        return "Username not be more than 20 characters";
                     }
 
                 }

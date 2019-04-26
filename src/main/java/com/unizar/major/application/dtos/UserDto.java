@@ -17,7 +17,7 @@ public class UserDto {
 
     private String rol;
 
-    private String nameUser;
+    private String userName;
 
     private String email;
 
@@ -25,6 +25,16 @@ public class UserDto {
 
     @JsonIgnore
     private List<Booking> bookings;
+
+    public UserDto(long id, String firstName, String lastName, String rol, String userName, String email, String pwd){
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.rol = rol;
+        this.userName = userName;
+        this.email= email;
+        this.password = pwd;
+    }
 
     public long getId() {
         return id;
@@ -58,12 +68,12 @@ public class UserDto {
         this.rol = rol;
     }
 
-    public String getNameUser() {
-        return nameUser;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setNameUser(String nameUser) {
-        this.nameUser = nameUser;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public List<Booking> getBookings() {
