@@ -89,7 +89,16 @@ public class MajorApplicationTests {
     @Test
     public void whenCreateNewUser(){
 
-        UserDto userDto = new UserDto(1,"mario", "amador", "estudiante", "mamador","mamador@unizar.es","mmmmmmmm");
+        UserDto userDto = new UserDto();
+        userDto.setId(1);
+        userDto.setFirstName("mario");
+        userDto.setLastName("amador");
+        userDto.setRol("estudiante");
+        userDto.setUserName("mamador");
+        userDto.setEmail("mamador@unizar.es");
+        userDto.setPassword("mmmmmmmm");
+
+
         userService.createUser(0,userDto);
 
         Optional<User> user_new = userRepository.findById(userDto.getId());
@@ -115,7 +124,14 @@ public class MajorApplicationTests {
 
     @Test
     public void whenGetUser(){
-        UserDto userDto = new UserDto(1,"mario", "amador", "estudiante", "mamador","mamador@unizar.es","mmmmmmmm");
+        UserDto userDto = new UserDto();
+        userDto.setId(1);
+        userDto.setFirstName("mario");
+        userDto.setLastName("amador");
+        userDto.setRol("estudiante");
+        userDto.setUserName("mamador");
+        userDto.setEmail("mamador@unizar.es");
+        userDto.setPassword("mmmmmmmm");
         userService.createUser(0,userDto);
         Optional<User> user = userService.getUser(userDto.getId());
 
@@ -132,7 +148,14 @@ public class MajorApplicationTests {
 
     @Test
     public void whenDeleteUser(){
-        UserDto userDto = new UserDto(1,"mario", "amador", "estudiante", "mamador","mamador@unizar.es","mmmmmmmm");
+        UserDto userDto = new UserDto();
+        userDto.setId(1);
+        userDto.setFirstName("mario");
+        userDto.setLastName("amador");
+        userDto.setRol("estudiante");
+        userDto.setUserName("mamador");
+        userDto.setEmail("mamador@unizar.es");
+        userDto.setPassword("mmmmmmmm");
         userService.createUser(0,userDto);
         userService.deleteUser(userDto.getId());
         Optional<User> user = userRepository.findById(userDto.getId());
@@ -141,10 +164,24 @@ public class MajorApplicationTests {
 
     @Test
     public void whenUpdateUser(){
-        UserDto userDto = new UserDto(2,"rosa", "perez", "estudiante", "rperez","rperez@unizar.es","rrrrrrrr");
+        UserDto userDto = new UserDto();
+        userDto.setId(2);
+        userDto.setFirstName("rosa");
+        userDto.setLastName("perez");
+        userDto.setRol("estudiante");
+        userDto.setUserName("rperez");
+        userDto.setEmail("rperez@unizar.es");
+        userDto.setPassword("rrrrrrrr");
         userService.createUser(0,userDto);
 
-        UserDto userDto_mod = new UserDto(2,"rosa", "perez", "admin", "rperez1","rperez1@unizar.es","rrrrrrrr1");
+        UserDto userDto_mod = new UserDto();
+        userDto_mod.setId(2);
+        userDto_mod.setFirstName("rosa");
+        userDto_mod.setLastName("perez");
+        userDto_mod.setRol("admin");
+        userDto_mod.setUserName("rperez1");
+        userDto_mod.setEmail("rperez1@unizar.es");
+        userDto_mod.setPassword("rrrrrrrr1");
         userService.updateUser(userDto.getId(),userDto_mod);
 
         Optional<User> user_mod = userRepository.findById(userDto.getId());

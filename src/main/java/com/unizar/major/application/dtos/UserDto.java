@@ -26,16 +26,6 @@ public class UserDto {
     @JsonIgnore
     private List<Booking> bookings;
 
-    public UserDto(long id, String firstName, String lastName, String rol, String userName, String email, String pwd){
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.rol = rol;
-        this.userName = userName;
-        this.email= email;
-        this.password = pwd;
-    }
-
     public long getId() {
         return id;
     }
