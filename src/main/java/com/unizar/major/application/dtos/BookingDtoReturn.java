@@ -1,9 +1,11 @@
 package com.unizar.major.application.dtos;
 
 import com.unizar.major.domain.Period;
+import com.unizar.major.domain.Space;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 public class BookingDtoReturn {
     private long id;
@@ -21,6 +23,8 @@ public class BookingDtoReturn {
     private String periodRep;
 
     private Date finalDate;
+
+    private Collection<Space> spaces;
 
 
     public long getId() {
@@ -85,5 +89,13 @@ public class BookingDtoReturn {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public Collection<Space> getSpaces() {
+        return spaces;
+    }
+
+    public void setSpaces(List<Space> spaces) {
+        this.spaces = spaces;
     }
 }

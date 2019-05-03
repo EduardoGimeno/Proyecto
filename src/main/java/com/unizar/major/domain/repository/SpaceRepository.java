@@ -8,8 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface SpaceRepository extends JpaRepository<Space, Long> {
+public interface SpaceRepository extends JpaRepository<Space, String> {
     List<Space> findAll();
-    Optional<Space> findById(Long id);
+    Optional<Space> findById(String id);
+    Optional<Space> findByGid(int id);
 
 }

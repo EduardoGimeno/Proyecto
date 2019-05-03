@@ -2,7 +2,10 @@ package com.unizar.major.application.dtos;
 
 
 import com.unizar.major.domain.Period;
+import com.unizar.major.domain.Space;
+
 import java.util.Date;
+import java.util.List;
 
 
 public class BookingDto {
@@ -21,6 +24,9 @@ public class BookingDto {
     private Date finalDate;
 
     private boolean Especial;
+
+    private List<Integer> spaces;
+
 
 
     public long getId() {
@@ -77,5 +83,13 @@ public class BookingDto {
 
     public void setEspecial(boolean especial) {
         Especial = especial;
+    }
+
+    public List<Integer> getSpaces() {
+        return spaces;
+    }
+
+    public void setSpaces(List<Integer> spaces) {
+        this.spaces = spaces;
     }
 }

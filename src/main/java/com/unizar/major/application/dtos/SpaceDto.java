@@ -1,20 +1,14 @@
-package com.unizar.major.domain;
+package com.unizar.major.application.dtos;
 
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
-import javax.persistence.*;
+import com.unizar.major.domain.Booking;
+import com.unizar.major.domain.DataSpace;
+import com.unizar.major.domain.Geometry;
 
 import java.util.List;
 
-
-
-@Entity
-@Table (name = "espacios")
-public class Space {
+public class SpaceDto {
 
     private String id;
-    @Id
     private int gid;
     private String layer;
     private String subclasses;
@@ -24,32 +18,10 @@ public class Space {
     private String text;
     private double area;
     private double perimeter;
-
-    @Embedded
+    private Geometry geom;
     private DataSpace dataSpace;
 
-    @ManyToMany(mappedBy="spaces",fetch = FetchType.LAZY)
-    @JsonBackReference
     private List<Booking> bookings;
-
-    public Space(){
-
-    }
-
-    public Space(String id, int gid, String layer, String subclasses, String extendeden, String linetype, String entityhand, String text, double area, double perimeter, Geometry geom, DataSpace dataSpace) {
-        this.id = id;
-        this.gid = gid;
-        this.layer = layer;
-        this.subclasses = subclasses;
-        this.extendeden = extendeden;
-        this.linetype = linetype;
-        this.entityhand = entityhand;
-        this.text = text;
-        this.area = area;
-        this.perimeter = perimeter;
-        //this.geom = geom;
-        this.dataSpace = dataSpace;
-    }
 
     public String getId() {
         return id;
@@ -131,14 +103,14 @@ public class Space {
         this.perimeter = perimeter;
     }
 
-  /*  public Geometry getGeom() {
+    public Geometry getGeom() {
         return geom;
     }
-*/
-    /*public void setGeom(Geometry geom) {
+
+    public void setGeom(Geometry geom) {
         this.geom = geom;
     }
-*/
+
     public DataSpace getDataSpace() {
         return dataSpace;
     }
@@ -151,14 +123,7 @@ public class Space {
         return bookings;
     }
 
-    public void setBookings(Booking booking) {
-        if (booking.getSpaces()==null){
-            booking.setSpaces(this);
-        }
-        if(!this.bookings.contains(booking)) {
-            this.bookings.add(booking);
-        }
-
-
+    public void setBookings(List<Booking> bookings) {
+        this.bookings = bookings;
     }
 }

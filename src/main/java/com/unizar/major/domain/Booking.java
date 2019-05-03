@@ -1,11 +1,11 @@
 package com.unizar.major.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 
 @Entity
 @Table(name = "booking")
@@ -47,6 +47,11 @@ public class Booking {
     @Column(name="especial")
     private boolean especial;
 
+    @ManyToMany
+    @JoinTable(name ="booking_space", joinColumns = @JoinColumn(name="booking"),
+    inverseJoinColumns = @JoinColumn(name="space_gid"))
+    @JsonManagedReference
+    private Collection<Space> spaces = new ArrayList<>();
 
 
     public Booking(){
@@ -147,5 +152,17 @@ public class Booking {
 
     public void setEspecial(boolean especial) {
         this.especial = especial;
+    }
+
+    public Collection<Space> getSpaces() {
+        return spaces;
+    }
+
+    public void setSpaces(Space space) {
+        this.spaces.add(space);
+        if(!space.getBookings().contains(this)){
+            user.setBookings(this);
+        }
+
     }
 }

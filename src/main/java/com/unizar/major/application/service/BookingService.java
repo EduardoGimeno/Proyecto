@@ -3,8 +3,10 @@ package com.unizar.major.application.service;
 import com.unizar.major.application.dtos.BookingDto;
 import com.unizar.major.domain.Booking;
 import com.unizar.major.domain.Period;
+import com.unizar.major.domain.Space;
 import com.unizar.major.domain.User;
 import com.unizar.major.domain.repository.BookingRepository;
+import com.unizar.major.domain.repository.SpaceRepository;
 import com.unizar.major.domain.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +26,9 @@ public class BookingService {
     @Autowired
     private BookingRepository bookingRepository;
 
+    @Autowired
+    private SpaceRepository spaceRepository;
+
     Logger logger = LoggerFactory.getLogger(BookingService.class);
 
     public BookingService(){}
@@ -31,7 +36,6 @@ public class BookingService {
     @Transactional
     public String createNewBooking(Long id, BookingDto bookingDto){
         Optional<User> user = userRepository.findById(id);
-
         if (user.isPresent()){
             User u = user.get();
 
@@ -45,6 +49,11 @@ public class BookingService {
             booking.setFinalDate(null);
             booking.setPeriodRep(null);
             booking.setUser(u);
+
+            for (int i =0; i<bookingDto.getSpaces().size();i++){
+                Optional<Space> space = spaceRepository.findByGid(bookingDto.getSpaces().get(i));
+                booking.setSpaces(space.get());
+            }
 
             if (u.getRol() == "admin"){
                 booking.setEspecial(bookingDto.isEspecial());
@@ -66,6 +75,7 @@ public class BookingService {
     @Transactional
     public String createNewBookingPeriodic(Long id, BookingDto bookingDto){
         Optional<User> user = userRepository.findById(id);
+        List<Space> spaces = new ArrayList<>();
         if (user.isPresent()){
             User u = user.get();
             if (u.getRol() == "admin" || u.getRol()=="pdi"){
@@ -74,6 +84,12 @@ public class BookingService {
                 booking.setActive(true);
                 booking.setState("inicial");
                 booking.setUser(u);
+
+                for (int i =0; i<bookingDto.getSpaces().size();i++){
+                    Optional<Space> space = spaceRepository.findByGid(bookingDto.getSpaces().get(i));
+                    booking.setSpaces(space.get());
+                }
+
 
                 if (u.getRol() == "admin"){
                     booking.setEspecial(bookingDto.isEspecial());
@@ -239,6 +255,11 @@ public class BookingService {
             booking.setIsPeriodic(bookingDto.isIsPeriodic());
             booking.setReason(bookingDto.getReason());
             booking.setFinalDate(bookingDto.getFinalDate());
+            booking.getSpaces().clear();
+            for (int i =0; i<bookingDto.getSpaces().size();i++){
+                Optional<Space> space = spaceRepository.findByGid(bookingDto.getSpaces().get(i));
+                booking.setSpaces(space.get());
+            }
             bookingRepository.save(booking);
 
             return "Booking is update";
