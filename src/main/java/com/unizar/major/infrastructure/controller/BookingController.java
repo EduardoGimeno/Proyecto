@@ -88,6 +88,18 @@ public class BookingController {
         return bookingService.updateBooking(id, bookingDto);
     }
 
+    @PutMapping("/booking/{id}/validate")
+    public String validateBooking(@PathVariable long id){
+
+        return bookingService.validateBooking(id);
+    }
+
+    @PutMapping("/booking/{id}/cancel")
+    public String cancelBooking(@PathVariable long id){
+
+        return bookingService.cancelBooking(id);
+    }
+
     @DeleteMapping("/booking/{id}")
     public String deleteBooking(@PathVariable long id){
 
@@ -109,6 +121,20 @@ public class BookingController {
         return bookingDtosReturn;
 
     }
+
+
+    @GetMapping("/bookingspending")
+    public List<BookingDtoReturn> getBookingPending(){
+        List<Booking>bookings= bookingService.getBookingPending();
+        List<BookingDtoReturn> bookingDtosReturn = new ArrayList<>();
+
+        for (Booking b : bookings) {
+            bookingDtosReturn.add(convertDto(b));
+        }
+        return bookingDtosReturn;
+
+    }
+
 
     private Booking convertToEntity(BookingDto bookingDto) throws ParseException {
         ModelMapper modelMapper = new ModelMapper();

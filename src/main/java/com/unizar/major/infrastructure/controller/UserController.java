@@ -50,7 +50,7 @@ public class UserController {
     }
 
     @PostMapping("/user")
-    public String createUser(@RequestParam(value="id", required=false) long id, @RequestBody UserDto userDto) {
+    public String createUser(@RequestParam long id, @RequestBody UserDto userDto) {
 
         String email = userDto.getEmail();
         String unizar = "unizar.es";

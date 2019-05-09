@@ -36,18 +36,19 @@ public class UserService {
             e.printStackTrace();
         }
 
-        Optional<User> user = userRepository.findById(id);
+        /*Optional<User> user = userRepository.findById(id);
         User user1;
-        if (user.isPresent() && user.get().getRol()=="admin"){
-            user1 = new User(userDto.getFirstName(), userDto.getLastName(), userDto.getRol(), userDto.getUserName(), userDto.getEmail(),password_encript);
-            user1.setActive(true);
-            userRepository.save(user1);
-        }
+        String rol = user.get().getRol();
+        if (rol.compareTo("admin")==0){*/
+                User user1 = new User(userDto.getFirstName(), userDto.getLastName(), userDto.getRol(), userDto.getUserName(), userDto.getEmail(),password_encript);
+                user1.setActive(true);
+                userRepository.save(user1);
+        /*}
         else{
             user1 = new User(userDto.getFirstName(), userDto.getLastName(), "estudiante", userDto.getUserName(), userDto.getEmail(),password_encript);
             user1.setActive(true);
             userRepository.save(user1);
-        }
+        }*/
 
         Optional<User> user_2 = userRepository.findById(user1.getId());
         if (user_2.isPresent()) {
@@ -133,19 +134,25 @@ public class UserService {
 
         Optional<User> user = userRepository.findByUserName(loginDto.getLogin());
         if (user.isPresent()){
-            String password_encript="";
-            try{
-                byte[] data = loginDto.getPassword().getBytes("UTF-8");
-                password_encript = DigestUtils.md5DigestAsHex(data);
-            }catch(UnsupportedEncodingException e){
-                e.printStackTrace();
-            }
-            if (user.get().getPassword().compareTo(password_encript)==0){
-                return "login";
+            if (user.get().isActive()){
+                String password_encript="";
+                try{
+                    byte[] data = loginDto.getPassword().getBytes("UTF-8");
+                    password_encript = DigestUtils.md5DigestAsHex(data);
+                }catch(UnsupportedEncodingException e){
+                    e.printStackTrace();
+                }
+                if (user.get().getPassword().compareTo(password_encript)==0){
+                    return "login";
+                }
+                else{
+                    return "Password is incorrect";
+                }
             }
             else{
-                return "Password is incorrect";
+                return "User not is active in the system";
             }
+
         }
         else{
             return "Name of user is incorrect";

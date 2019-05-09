@@ -46,5 +46,7 @@ dependencies {
 	compile 'org.springframewor.security.oauth.boot:spring-security-oauth2-autoconfigure:2.0.1.RELEASE'
 	compile 'org.okta.spring:okta-spring-boot-starter:0.6.1'
 	compile 'org.modelmapper:modelmapper:1.1.0'
+	compile 'org.hibernate:hibernate-spatial:5.0.0.Final'
+	compile 'org.hibernate:hibernate-entitymanager:5.0.0.Final'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

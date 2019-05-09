@@ -2,6 +2,9 @@ package com.unizar.major.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 
@@ -25,8 +28,15 @@ public class Space {
     private double area;
     private double perimeter;
 
+    @Type(type="com.vividsolutions.jts.geom.Geometry")
+    @JsonIgnore
+    private MultiPolygon geom;
+
     @Embedded
     private DataSpace dataSpace;
+
+    @Embedded
+    private Materials materials;
 
     @ManyToMany(mappedBy="spaces",fetch = FetchType.LAZY)
     @JsonBackReference
@@ -36,7 +46,7 @@ public class Space {
 
     }
 
-    public Space(String id, int gid, String layer, String subclasses, String extendeden, String linetype, String entityhand, String text, double area, double perimeter, Geometry geom, DataSpace dataSpace) {
+    public Space(String id, int gid, String layer, String subclasses, String extendeden, String linetype, String entityhand, String text, double area, double perimeter, MultiPolygon geom, DataSpace dataSpace) {
         this.id = id;
         this.gid = gid;
         this.layer = layer;
@@ -47,7 +57,7 @@ public class Space {
         this.text = text;
         this.area = area;
         this.perimeter = perimeter;
-        //this.geom = geom;
+        this.geom = geom;
         this.dataSpace = dataSpace;
     }
 
@@ -131,14 +141,14 @@ public class Space {
         this.perimeter = perimeter;
     }
 
-  /*  public Geometry getGeom() {
+   public MultiPolygon getGeom() {
         return geom;
     }
-*/
-    /*public void setGeom(Geometry geom) {
+
+    public void setGeom(MultiPolygon geom) {
         this.geom = geom;
     }
-*/
+
     public DataSpace getDataSpace() {
         return dataSpace;
     }
@@ -160,5 +170,13 @@ public class Space {
         }
 
 
+    }
+
+    public Materials getMaterials() {
+        return materials;
+    }
+
+    public void setMaterials(Materials materials) {
+        this.materials = materials;
     }
 }

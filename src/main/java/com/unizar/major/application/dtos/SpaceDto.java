@@ -2,7 +2,7 @@ package com.unizar.major.application.dtos;
 
 import com.unizar.major.domain.Booking;
 import com.unizar.major.domain.DataSpace;
-import com.unizar.major.domain.Geometry;
+import com.unizar.major.domain.Materials;
 
 import java.util.List;
 
@@ -18,8 +18,8 @@ public class SpaceDto {
     private String text;
     private double area;
     private double perimeter;
-    private Geometry geom;
     private DataSpace dataSpace;
+    private Materials materials;
 
     private List<Booking> bookings;
 
@@ -103,14 +103,6 @@ public class SpaceDto {
         this.perimeter = perimeter;
     }
 
-    public Geometry getGeom() {
-        return geom;
-    }
-
-    public void setGeom(Geometry geom) {
-        this.geom = geom;
-    }
-
     public DataSpace getDataSpace() {
         return dataSpace;
     }
@@ -125,5 +117,13 @@ public class SpaceDto {
 
     public void setBookings(List<Booking> bookings) {
         this.bookings = bookings;
+    }
+
+    public Materials getMaterials() {
+        return materials;
+    }
+
+    public void setMaterials(Materials materials) {
+        this.materials = materials;
     }
 }
