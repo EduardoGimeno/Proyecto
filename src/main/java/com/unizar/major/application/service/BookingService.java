@@ -331,4 +331,10 @@ public class BookingService {
             return "Booking not exist";
         }
     }
+
+    public long getIdUser (long id){
+        Optional<Booking> booking = bookingRepository.findById(id);
+        long idUser = booking.get().getUser().getId();
+        return idUser;
+    }
 }
