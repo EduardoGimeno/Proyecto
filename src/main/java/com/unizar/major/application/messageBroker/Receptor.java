@@ -221,6 +221,8 @@ public class Receptor implements CommandLineRunner {
             logger.error("fetchUserBookingsByID", e);
             return "500;null";
         }
+
+
     }
 
     private List<BookingDtoReturn> convertBookingListIntoDto(List<Booking> input) {

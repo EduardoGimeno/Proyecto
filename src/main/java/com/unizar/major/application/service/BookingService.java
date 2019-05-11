@@ -78,7 +78,7 @@ public class BookingService {
         List<Space> spaces = new ArrayList<>();
         if (user.isPresent()){
             User u = user.get();
-            if (u.getRol() == "admin" || u.getRol()=="pdi"){
+            if (u.getRol().compareTo("admin")==0 || u.getRol().compareTo("pdi")==0){
                 Collection<Period> p = calculatePeriods(bookingDto.getPeriodRep(), bookingDto.getFinalDate(),bookingDto.getPeriod().getstartDate(),bookingDto.getPeriod().getEndDate());
                 Booking booking = new Booking(bookingDto.isIsPeriodic(), bookingDto.getReason(),p, bookingDto.getPeriodRep(), bookingDto.getFinalDate());
                 booking.setActive(true);
@@ -91,7 +91,7 @@ public class BookingService {
                 }
 
 
-                if (u.getRol() == "admin"){
+                if (u.getRol().compareTo("admin") == 0){
                     booking.setEspecial(bookingDto.isEspecial());
                 }
                 else{
@@ -110,6 +110,12 @@ public class BookingService {
         }
 
         return "Booking is created";
+
+    }
+
+    public boolean cumplePolitica(BookingDto bookingDto){
+
+        return true;
 
     }
 
@@ -268,10 +274,6 @@ public class BookingService {
             return "Booking not exists";
         }
 
-
-
-
-
     }
 
     @Transactional
@@ -297,5 +299,36 @@ public class BookingService {
 
         return booking;
 
+    }
+
+    public List<Booking> getBookingPending (){
+        return bookingRepository.findByState("inicial");
+    }
+
+    @Transactional
+    public String validateBooking(long id){
+        Optional<Booking> booking = bookingRepository.findById(id);
+        if (booking.isPresent()){
+            Booking b = booking.get();
+            b.setState("valida");
+            bookingRepository.save(b);
+            return "Booking is validate";
+        }else{
+            return "Booking not exist";
+        }
+    }
+
+    @Transactional
+    public String cancelBooking(long id){
+        Optional<Booking> booking = bookingRepository.findById(id);
+        if (booking.isPresent()){
+            Booking b = booking.get();
+            b.setState("invalida");
+            b.setActive(false);
+            bookingRepository.save(b);
+            return "Booking is canceled";
+        }else{
+            return "Booking not exist";
+        }
     }
 }

@@ -45,5 +45,7 @@ dependencies {
 	compile 'org.okta.spring:okta-spring-boot-starter:0.6.1'
 	compile 'org.modelmapper:modelmapper:1.1.0'
 	compile('com.rabbitmq:amqp-client:3.4.1')
+	compile 'org.hibernate:hibernate-spatial:5.0.0.Final'
+	compile 'org.hibernate:hibernate-entitymanager:5.0.0.Final'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

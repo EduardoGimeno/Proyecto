@@ -20,7 +20,7 @@ public class UserDto {
     private String userName;
     private String email;
     private String password;
-    @JsonIgnore private List<Booking> bookings;
+    //@JsonIgnore private List<Booking> bookings;
 
     public long getId() {
         return id;
@@ -74,13 +74,13 @@ public class UserDto {
         this.userName = userName;
     }
 
-    public List<Booking> getBookings() {
+    /*public List<Booking> getBookings() {
         return bookings;
     }
     public void setBookings(List<Booking> bookings) {
         this.bookings = bookings;
     }
-
+*/
     public String getEmail() {
         return email;
     }
