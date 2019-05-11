@@ -37,8 +37,6 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
 	implementation 'org.postgresql:postgresql:9.4-1206-jdbc42'
@@ -46,5 +44,6 @@ dependencies {
 	compile 'org.springframewor.security.oauth.boot:spring-security-oauth2-autoconfigure:2.0.1.RELEASE'
 	compile 'org.okta.spring:okta-spring-boot-starter:0.6.1'
 	compile 'org.modelmapper:modelmapper:1.1.0'
+	compile('com.rabbitmq:amqp-client:3.4.1')
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

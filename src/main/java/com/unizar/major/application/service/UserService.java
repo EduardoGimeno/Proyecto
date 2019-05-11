@@ -11,6 +11,7 @@ import org.springframework.util.DigestUtils;
 
 import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,52 +27,24 @@ public class UserService {
     }
 
     @Transactional
-    public String createUser(long id,UserDto userDto) {
-        String password_encript="";
+    public Boolean createUser(UserDto userDto) {
 
-        try{
-            byte[] data = userDto.getPassword().getBytes("UTF-8");
-            password_encript = DigestUtils.md5DigestAsHex(data);
-        }catch(UnsupportedEncodingException e){
-            e.printStackTrace();
-        }
+        byte[] data = userDto.getPassword().getBytes(StandardCharsets.UTF_8);
+        String password_encrypt = DigestUtils.md5DigestAsHex(data);
 
-        Optional<User> user = userRepository.findById(id);
-        User user1;
-        if (user.isPresent() && user.get().getRol()=="admin"){
-            user1 = new User(userDto.getFirstName(), userDto.getLastName(), userDto.getRol(), userDto.getUserName(), userDto.getEmail(),password_encript);
-            user1.setActive(true);
-            userRepository.save(user1);
-        }
-        else{
-            user1 = new User(userDto.getFirstName(), userDto.getLastName(), "estudiante", userDto.getUserName(), userDto.getEmail(),password_encript);
-            user1.setActive(true);
-            userRepository.save(user1);
-        }
+        User user1 = new User(userDto.getFirstName(), userDto.getLastName(), userDto.getRol().toString().toUpperCase(), userDto.getUserName(), userDto.getEmail(), password_encrypt);
+        user1.setActive(true);
+        userRepository.save(user1);
 
-        Optional<User> user_2 = userRepository.findById(user1.getId());
-        if (user_2.isPresent()) {
-            return "User "+ user_2.get().getUserName() +" is created";
-        }
-        else {
-            return "User "+ user_2.get().getUserName()+" is not created";
-        }
-
+        return userRepository.findById(user1.getId()).isPresent();
     }
 
     public Optional<User> getUser (long id){
-        Optional<User> user = userRepository.findById(id);
-        if (user.isPresent()) {
-            return user;
-        }
-        else {
-            return null;
-        }
-
+        return userRepository.findById(id);
     }
 
     @Transactional
-    public String deleteUser(long id){
+    public Boolean deleteUser(long id){
 
         Optional<User> user = userRepository.findById(id);
 
@@ -83,38 +56,29 @@ public class UserService {
                 b.setActive(false);
             }
 
-            return "User "+ user.get().getUserName()+" is deleted";
+            return true;
         }
-        else {
-            return "User not exist";
-        }
-
-        // else 404
-
+        return false;
     }
 
     @Transactional
-    public String updateUser(long id, UserDto userDto){
+    public Boolean updateUser(long id, UserDto userDto){
 
         Optional<User> u = userRepository.findById(id);
         if (u.isPresent()){
+            byte[] data = userDto.getPassword().getBytes(StandardCharsets.UTF_8);
+            String password_encrypt = DigestUtils.md5DigestAsHex(data);
+
             User user = u.get();
-            user.setFirstName(userDto.getFirstName());
-            user.setLastName(userDto.getLastName());
-            user.setUserName(userDto.getUserName());
-            user.setEmail(userDto.getEmail());
-            user.setPassword(userDto.getPassword());
+            if(userDto.getFirstName() != null) { user.setFirstName(userDto.getFirstName()); }
+            if(userDto.getLastName() != null) { user.setLastName(userDto.getLastName()); }
+            if(userDto.getUserName() != null) { user.setUserName(userDto.getUserName()); }
+            if(userDto.getEmail() != null) { user.setEmail(userDto.getEmail()); }
+            if(userDto.getPassword() != null) { user.setPassword(password_encrypt); }
             userRepository.save(user);
-            return "User is update";
+            return true;
         }
-        else{
-            return "User not exist";
-        }
-
-
-
-
-
+        return false;
     }
 
     public List<Booking> getBookings (long id){
@@ -129,27 +93,18 @@ public class UserService {
 
     }
 
-    public String loginUser(LoginDto loginDto) {
+    public Optional<User> loginUser(LoginDto loginDto) {
 
         Optional<User> user = userRepository.findByUserName(loginDto.getLogin());
-        if (user.isPresent()){
-            String password_encript="";
-            try{
-                byte[] data = loginDto.getPassword().getBytes("UTF-8");
-                password_encript = DigestUtils.md5DigestAsHex(data);
-            }catch(UnsupportedEncodingException e){
-                e.printStackTrace();
-            }
-            if (user.get().getPassword().compareTo(password_encript)==0){
-                return "login";
-            }
-            else{
-                return "Password is incorrect";
+        if (user.isPresent() && user.get().isActive()){
+            String password_encrypt;
+            byte[] data = loginDto.getPassword().getBytes(StandardCharsets.UTF_8);
+            password_encrypt = DigestUtils.md5DigestAsHex(data);
+            if(user.get().getPassword().compareTo(password_encrypt)==0) {
+                return user;
             }
         }
-        else{
-            return "Name of user is incorrect";
-        }
+        return Optional.empty();
     }
 
 }

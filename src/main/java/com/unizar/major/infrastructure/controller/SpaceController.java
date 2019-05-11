@@ -1,27 +1,12 @@
 package com.unizar.major.infrastructure.controller;
 
-import com.unizar.major.application.dtos.BookingDto;
-import com.unizar.major.application.dtos.BookingDtoReturn;
-import com.unizar.major.application.dtos.SpaceDto;
-import com.unizar.major.application.service.BookingService;
-import com.unizar.major.application.service.SpaceService;
-import com.unizar.major.domain.Booking;
-import com.unizar.major.domain.Space;
-import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
+/*
 @RestController
 public class SpaceController {
 
+    @Autowired
+    Receptor receptor;
+/*
     @Autowired
     SpaceService spaceService;
 
@@ -72,3 +57,4 @@ public class SpaceController {
     }
 
 }
+*/

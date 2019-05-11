@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
+/*
 @RestController
 public class UserController {
 
@@ -34,7 +34,7 @@ public class UserController {
     Logger logger = LoggerFactory.getLogger(BookingService.class);
 
 
-    @PostMapping("/user/login")
+    /*@PostMapping("/user/login")
     public String loginUser(@RequestBody LoginDto loginDto){
 
         if (loginDto.getLogin().isEmpty()){
@@ -167,3 +167,4 @@ public class UserController {
 
 
 }
+*/
