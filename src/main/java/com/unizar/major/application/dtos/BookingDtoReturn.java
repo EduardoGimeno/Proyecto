@@ -23,7 +23,7 @@ public class BookingDtoReturn {
 
     private Date finalDate;
 
-    private List<Integer> spaces;
+    //private List<Integer> spaces;
 
 
     public long getId() {
@@ -90,11 +90,11 @@ public class BookingDtoReturn {
         this.active = active;
     }
 
-    public List<Integer> getSpaces() {
+    /*public List<Integer> getSpaces() {
         return spaces;
     }
 
     public void setSpaces(List<Integer> spaces) {
         this.spaces = spaces;
-    }
+    }*/
 }

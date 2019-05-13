@@ -48,7 +48,8 @@ public class Booking {
     private boolean especial;
 
     @ManyToMany
-    @JoinTable(name ="booking_space", joinColumns = @JoinColumn(name="booking"),
+    @JoinTable(name ="booking_space",
+    joinColumns = @JoinColumn(name="booking"),
     inverseJoinColumns = @JoinColumn(name="space_gid"))
     @JsonManagedReference
     private List<Space> spaces = new ArrayList<>();

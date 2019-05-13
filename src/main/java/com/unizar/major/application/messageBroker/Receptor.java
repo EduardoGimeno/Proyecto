@@ -252,11 +252,11 @@ public class Receptor implements CommandLineRunner {
             bdr.setActive(booking.isActive());
             bdr.setPeriodRep(booking.getPeriodRep());
             bdr.setFinalDate(booking.getFinalDate());
-            List<Integer> spaces = new ArrayList<>();
+            /*List<Integer> spaces = new ArrayList<>();
             for (Space space: booking.getSpaces()) {
                 spaces.add(space.getGid());
             }
-            bdr.setSpaces(spaces);
+            bdr.setSpaces(spaces);*/
             output.add(bdr);
             //output.add(new ModelMapper().map(booking, BookingDtoReturn.class));
         }
@@ -279,7 +279,7 @@ public class Receptor implements CommandLineRunner {
         try {
             Optional booking = bookingService.getBookingById(Long.parseLong(message));
             if(booking.isPresent()) {
-                return "200;" + new ObjectMapper().writeValueAsString(new ModelMapper().map(booking, BookingDtoReturn.class));
+                return "200;" + new ObjectMapper().writeValueAsString(new ModelMapper().map(booking.get(), BookingDtoReturn.class));
             } else {
                 return "404;null";
             }
