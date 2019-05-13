@@ -1,19 +1,19 @@
 package com.unizar.major.application.messageBroker;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.QueueingConsumer;
+import com.unizar.major.application.dtos.BookingDto;
 import com.unizar.major.application.dtos.BookingDtoReturn;
 import com.unizar.major.application.dtos.LoginDto;
 import com.unizar.major.application.dtos.UserDto;
 import com.unizar.major.application.service.BookingService;
 import com.unizar.major.application.service.UserService;
 import com.unizar.major.domain.Booking;
+import com.unizar.major.domain.Space;
 import com.unizar.major.domain.User;
-import com.unizar.major.domain.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.awt.print.Book;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,10 +57,6 @@ public class Receptor implements CommandLineRunner {
 
     @Autowired
     UserService userService;
-
-    @Autowired
-    UserRepository userRepository;
-
 
     @Override
     public void run(String... args) throws Exception {
@@ -124,10 +119,34 @@ public class Receptor implements CommandLineRunner {
                     retMessage = fetchUserBookingsByID(messageParts[2]);
                     break;
                 case "getUserIDOfBooking":
-                    retMessage = "200;155";
+                    retMessage = getUserIDOfBooking(messageParts[2]);
                     break;
                 case "getBookingById":
-                    retMessage = "200" + ";" + "{ \"id\": 2, \"isPeriodic\": false, \"reason\": \"charla tfg9\", \"period\": [ { \"startDate\": \"2019-04-09T18:00:00.000+0000\", \"endDate\": \"2019-04-09T20:00:00.000+0000\" } ], \"state\": \"inicial\", \"active\": true, \"periodRep\": null, \"finalDate\": null}";
+                    retMessage = getBookingById(messageParts[2]);
+                    break;
+                case "createNewBooking":
+                    retMessage = createNewBooking(messageParts[2]);
+                    break;
+                case "createNewPeriodicBooking":
+                    retMessage = createNewPeriodicBooking(messageParts[2]);
+                    break;
+                case "deleteBookingById":
+                    retMessage = deleteBookingById(messageParts[2]);
+                    break;
+                case "putBookingById":
+                    retMessage = putBookingById(messageParts[2]);
+                    break;
+                case "fetchAllBookings":
+                    retMessage = fetchAllBookings();
+                    break;
+                case "fetchPendingBookings":
+                    retMessage = fetchPendingBookings();
+                    break;
+                case "validateBookingById":
+                    retMessage = validateBookingById(messageParts[2]);
+                    break;
+                case "cancelBookingById":
+                    retMessage = cancelBookingById(messageParts[2]);
                     break;
                 default:
                     retMessage = "500;null";
@@ -146,7 +165,7 @@ public class Receptor implements CommandLineRunner {
             Optional logUser = userService.loginUser(new ObjectMapper().readValue(message, LoginDto.class));
 
             if (logUser.isPresent()) {
-                return "200;" + UUID.randomUUID().toString() + "::" + ((User) logUser.get()).getRol().toUpperCase() + "::" + ((User) logUser.get()).getId();
+                return "200;" + UUID.randomUUID().toString() + "::" + ((User) logUser.get()).getRol() + "::" + ((User) logUser.get()).getId();
             }
             return "401;null";
         } catch (IOException e) {
@@ -159,8 +178,7 @@ public class Receptor implements CommandLineRunner {
         logger.info("createNewUser message received{" + message + "}");
         try {
             UserDto inUserDto = new ObjectMapper().readValue(message, UserDto.class);
-            if (!userRepository.findByUserName(inUserDto.getUserName()).isPresent() &&
-                    !userRepository.findByEmail(inUserDto.getEmail()).isPresent()) {
+            if (!userService.existsUserInSystem(inUserDto)) {
                 Boolean status = userService.createUser(inUserDto);
                 return (status ? "201;null" : "500;null");
             }
@@ -221,20 +239,144 @@ public class Receptor implements CommandLineRunner {
             logger.error("fetchUserBookingsByID", e);
             return "500;null";
         }
-
-
     }
 
     private List<BookingDtoReturn> convertBookingListIntoDto(List<Booking> input) {
         List<BookingDtoReturn> output = new ArrayList<>();
         for(Booking booking : input) {
-            output.add(new ModelMapper().map(booking, BookingDtoReturn.class));
+            BookingDtoReturn bdr = new BookingDtoReturn();
+            bdr.setIsPeriodic(booking.isIsPeriodic());
+            bdr.setReason(booking.getReason());
+            bdr.setPeriod(booking.getPeriod());
+            bdr.setState(booking.getState());
+            bdr.setActive(booking.isActive());
+            bdr.setPeriodRep(booking.getPeriodRep());
+            bdr.setFinalDate(booking.getFinalDate());
+            List<Integer> spaces = new ArrayList<>();
+            for (Space space: booking.getSpaces()) {
+                spaces.add(space.getGid());
+            }
+            bdr.setSpaces(spaces);
+            output.add(bdr);
+            //output.add(new ModelMapper().map(booking, BookingDtoReturn.class));
         }
         return output;
     }
-/*
-    private String getUserIDOfBooking(String message) {
 
+    private String getUserIDOfBooking(String message) {
+        logger.info("getUserIDOfBooking message received{" + message + "}");
+        try {
+            long fetchedID = bookingService.getBookingOwnerByID(Long.parseLong(message));
+            return (fetchedID != -1 ? "200;" + fetchedID : "404;null");
+        } catch (Exception e) {
+            logger.error("getUserIDOfBooking", e);
+            return "500;null";
+        }
     }
-*/
+
+    private String getBookingById(String message) {
+        logger.info("getBookingById message received{" + message + "}");
+        try {
+            Optional booking = bookingService.getBookingById(Long.parseLong(message));
+            if(booking.isPresent()) {
+                return "200;" + new ObjectMapper().writeValueAsString(new ModelMapper().map(booking, BookingDtoReturn.class));
+            } else {
+                return "404;null";
+            }
+        } catch (Exception e) {
+            logger.error("getBookingById", e);
+            return "500;null";
+        }
+    }
+
+    private String createNewBooking(String message) {
+        logger.info("createNewBooking message received{" + message + "}");
+        String[] args = message.split("::");
+        try {
+            Boolean status = bookingService.createNewBooking(Long.parseLong(args[0]), new ObjectMapper().readValue(args[1], BookingDto.class));
+            return (status ? "201;null" : "404;null");
+        } catch (Exception e) {
+            logger.error("createNewBooking", e);
+            return "500;null";
+        }
+    }
+
+    private String createNewPeriodicBooking(String message) {
+        logger.info("createNewPeriodicBooking message received{" + message + "}");
+        String[] args = message.split("::");
+        try {
+            Boolean status = bookingService.createNewPeriodicBooking(Long.parseLong(args[0]), new ObjectMapper().readValue(args[1], BookingDto.class));
+            return (status ? "201;null" : "404;null");
+        } catch (Exception e) {
+            logger.error("createNewPeriodicBooking", e);
+            return "500;null";
+        }
+    }
+
+    private String deleteBookingById(String message) {
+        logger.info("deleteBookingById message received{" + message + "}");
+        try {
+            Boolean status = bookingService.deleteBooking(Long.parseLong(message));
+            return (status ? "202;null" : "404;null");
+        } catch (Exception e) {
+            logger.error("deleteBookingById", e);
+            return "500;null";
+        }
+    }
+
+    private String putBookingById(String message) {
+        logger.info("putBookingById message received{" + message + "}");
+        String[] args = message.split("::");
+        try {
+            Boolean status = bookingService.updateBooking(Long.parseLong(args[0]), new ObjectMapper().readValue(args[1], BookingDto.class));
+            return (status ? "202;null" : "404;null");
+        } catch (Exception e) {
+            logger.error("putBookingById", e);
+            return "500;null";
+        }
+    }
+
+    private String fetchAllBookings() {
+        logger.info("fetchAllBookings message received{ no args }");
+        try {
+            List<Booking> bookings = bookingService.getAllBookings();
+            return "200;" + new ObjectMapper().writeValueAsString(convertBookingListIntoDto(bookings));
+        } catch (Exception e) {
+            logger.error("fetchAllBookings", e);
+            return "500;null";
+        }
+    }
+
+    private String fetchPendingBookings() {
+        logger.info("fetchPendingBookings message received{ no args }");
+        try {
+            List<Booking> bookings = bookingService.getBookingPending();
+            return "200;" + new ObjectMapper().writeValueAsString(convertBookingListIntoDto(bookings));
+        } catch (Exception e) {
+            logger.error("fetchPendingBookings", e);
+            return "500;null";
+        }
+    }
+
+    private String validateBookingById(String message) {
+        logger.info("validateBookingById message received{" + message + "}");
+        try {
+            Boolean status = bookingService.validateBooking(Long.parseLong(message));
+            return (status ? "202;null" : "404;null");
+        } catch (Exception e) {
+            logger.error("validateBookingById", e);
+            return "500;null";
+        }
+    }
+
+    private String cancelBookingById(String message) {
+        logger.info("cancelBookingById message received{" + message + "}");
+        try {
+            Boolean status = bookingService.cancelBooking(Long.parseLong(message));
+            return (status ? "202;null" : "404;null");
+        } catch (Exception e) {
+            logger.error("cancelBookingById", e);
+            return "500;null";
+        }
+    }
 }

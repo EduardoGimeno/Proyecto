@@ -38,7 +38,7 @@ public class Space {
     @Embedded
     private Materials materials;
 
-    @ManyToMany(mappedBy="spaces",fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy="spaces",fetch = FetchType.EAGER)
     @JsonBackReference
     private List<Booking> bookings;
 

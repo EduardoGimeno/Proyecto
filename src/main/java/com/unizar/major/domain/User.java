@@ -9,6 +9,11 @@ import java.util.List;
 @Entity
 @Table (name = "personEina")
 public class User{
+
+    public enum Rol {
+        ESTUDIANTE, PAS, ADMIN
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name="iduser")
@@ -20,8 +25,9 @@ public class User{
     @Column(name="lastname")
     private String lastName;
 
+    @Enumerated(EnumType.STRING)
     @Column(name="rol")
-    private String rol;
+    private Rol rol;
 
     @Column(name="nombreusuario")
     private String userName;
@@ -44,10 +50,19 @@ public class User{
 
     }
 
-    public User(String firstName, String lastName, String rol, String nameuser, String email, String password){
+    public User(String firstName, String lastName, Rol rol, String nameuser, String email, String password){
         this.firstName=firstName;
         this.lastName = lastName;
         this.rol = rol;
+        this.userName = nameuser;
+        this.email = email;
+        this.password = password;
+    }
+
+    public User(String firstName, String lastName, String rol, String nameuser, String email, String password){
+        this.firstName=firstName;
+        this.lastName = lastName;
+        this.rol = Rol.valueOf(rol.toUpperCase());
         this.userName = nameuser;
         this.email = email;
         this.password = password;
@@ -91,13 +106,15 @@ public class User{
         this.lastName = lastName;
     }
 
-    public String getRol(){
+    public Rol getRol(){
         return rol;
     }
 
-    public void setRol(String rol){
+    public void setRol(Rol rol){
         this.rol = rol;
     }
+
+    public void setRol(String rol) { this.rol = Rol.valueOf(rol); }
 
     public String getUserName(){
         return userName;

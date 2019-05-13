@@ -28,9 +28,9 @@ public class Booking {
     private User user;
 
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name="Booking_Period", joinColumns = @JoinColumn(name="id_booking"))
-    private Collection<Period> periods = new ArrayList<>();
+    private List<Period> periods = new ArrayList<>();
 
     @Column(name="state")
     private String state;
@@ -51,31 +51,31 @@ public class Booking {
     @JoinTable(name ="booking_space", joinColumns = @JoinColumn(name="booking"),
     inverseJoinColumns = @JoinColumn(name="space_gid"))
     @JsonManagedReference
-    private Collection<Space> spaces = new ArrayList<>();
+    private List<Space> spaces = new ArrayList<>();
 
 
     public Booking(){
 
     }
 
-    public Booking(boolean isPeriodic, String reason, Collection<Period> periods){
+    public Booking(boolean isPeriodic, String reason, List<Period> periods){
         this.isPeriodic = isPeriodic;
         this.reason=reason;
         this.periods = periods;
     }
 
-    public Booking(boolean isPeriodic, String reason, Collection<Period> periods, String periodRep, Date finalDate){
+    public Booking(boolean isPeriodic, String reason, List<Period> periods, String periodRep, Date finalDate){
         this.isPeriodic = isPeriodic;
         this.reason=reason;
         this.periods = periods;
         this.periodRep = periodRep;
         this.finalDate = finalDate;
     }
-    public Collection<Period> getPeriod() {
+    public List<Period> getPeriod() {
         return this.periods;
     }
 
-    public void setPeriod(Collection<Period> period) {
+    public void setPeriod(List<Period> period) {
         this.periods = period;
     }
 
@@ -154,7 +154,7 @@ public class Booking {
         this.especial = especial;
     }
 
-    public Collection<Space> getSpaces() {
+    public List<Space> getSpaces() {
         return spaces;
     }
 

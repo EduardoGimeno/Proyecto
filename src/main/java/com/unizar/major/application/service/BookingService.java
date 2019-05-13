@@ -35,13 +35,13 @@ public class BookingService {
     }
 
     @Transactional
-    public String createNewBooking(Long id, BookingDto bookingDto) {
+    public Boolean createNewBooking(Long id, BookingDto bookingDto) {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {
             User u = user.get();
 
             Period period = new Period(bookingDto.getPeriod().getstartDate(), bookingDto.getPeriod().getEndDate());
-            Collection<Period> p = new ArrayList<>();
+            List<Period> p = new ArrayList<>();
             p.add(period);
 
             Booking booking = new Booking(bookingDto.isIsPeriodic(), bookingDto.getReason(), p);
@@ -56,57 +56,41 @@ public class BookingService {
                 booking.setSpaces(space.get());
             }
 
-            if (u.getRol() == "admin") {
+            booking.setEspecial(bookingDto.isEspecial());
+
+            bookingRepository.save(booking);
+            return true;
+        }
+        return false; //404
+    }
+
+    @Transactional
+    public Boolean createNewPeriodicBooking(Long id, BookingDto bookingDto) {
+        Optional<User> user = userRepository.findById(id);
+        List<Space> spaces = new ArrayList<>();
+        if (user.isPresent()) {
+            User u = user.get();
+            List<Period> p = calculatePeriods(bookingDto.getPeriodRep(), bookingDto.getFinalDate(), bookingDto.getPeriod().getstartDate(), bookingDto.getPeriod().getEndDate());
+            Booking booking = new Booking(bookingDto.isIsPeriodic(), bookingDto.getReason(), p, bookingDto.getPeriodRep(), bookingDto.getFinalDate());
+            booking.setActive(true);
+            booking.setState("inicial");
+            booking.setUser(u);
+
+            for (int i = 0; i < bookingDto.getSpaces().size(); i++) {
+                Optional<Space> space = spaceRepository.findByGid(bookingDto.getSpaces().get(i));
+                booking.setSpaces(space.get());
+            }
+
+            if (u.getRol() == User.Rol.ADMIN) {
                 booking.setEspecial(bookingDto.isEspecial());
             } else {
                 booking.setEspecial(false);
             }
 
             bookingRepository.save(booking);
-        } else {
-            return "User with id " + id + "not exist";
+            return true;
         }
-
-        return "Booking is created";
-
-    }
-
-    @Transactional
-    public String createNewBookingPeriodic(Long id, BookingDto bookingDto) {
-        Optional<User> user = userRepository.findById(id);
-        List<Space> spaces = new ArrayList<>();
-        if (user.isPresent()) {
-            User u = user.get();
-            if (u.getRol().compareTo("admin") == 0 || u.getRol().compareTo("pdi") == 0) {
-                Collection<Period> p = calculatePeriods(bookingDto.getPeriodRep(), bookingDto.getFinalDate(), bookingDto.getPeriod().getstartDate(), bookingDto.getPeriod().getEndDate());
-                Booking booking = new Booking(bookingDto.isIsPeriodic(), bookingDto.getReason(), p, bookingDto.getPeriodRep(), bookingDto.getFinalDate());
-                booking.setActive(true);
-                booking.setState("inicial");
-                booking.setUser(u);
-
-                for (int i = 0; i < bookingDto.getSpaces().size(); i++) {
-                    Optional<Space> space = spaceRepository.findByGid(bookingDto.getSpaces().get(i));
-                    booking.setSpaces(space.get());
-                }
-
-
-                if (u.getRol().compareTo("admin") == 0) {
-                    booking.setEspecial(bookingDto.isEspecial());
-                } else {
-                    booking.setEspecial(false);
-                }
-
-                bookingRepository.save(booking);
-            } else {
-                return "User student don't have permission to create booking periodic";
-            }
-
-        } else {
-            return "User with id " + id + "not exist";
-        }
-
-        return "Booking is created";
-
+        return false;
     }
 
     public boolean cumplePolitica(BookingDto bookingDto) {
@@ -115,10 +99,10 @@ public class BookingService {
 
     }
 
-    public Collection<Period> calculatePeriods(String periodRep, Date finalDate, Date startDate, Date endDate) {
+    public List<Period> calculatePeriods(String periodRep, Date finalDate, Date startDate, Date endDate) {
 
 
-        Collection<Period> p = new ArrayList<>();
+        List<Period> p = new ArrayList<>();
         Calendar calendar;
 
         Period period = new Period();
@@ -227,29 +211,21 @@ public class BookingService {
                 break;
 
         }
-
         return p;
     }
 
 
     public Optional<Booking> getBookingById(long id) {
-
-        Optional<Booking> booking = bookingRepository.findById(id);
-        if (booking.isPresent()) {
-            return booking;
-        } else {
-            return null;
-        }
-
+        return bookingRepository.findById(id);
     }
 
     @Transactional
-    public String updateBooking(long id, BookingDto bookingDto) {
+    public Boolean updateBooking(long id, BookingDto bookingDto) {
 
         Optional<Booking> b = bookingRepository.findById(id);
         if (b.isPresent()) {
             Booking booking = b.get();
-            Collection<Period> p = calculatePeriods(bookingDto.getPeriodRep(), bookingDto.getFinalDate(), bookingDto.getPeriod().getstartDate(), bookingDto.getPeriod().getEndDate());
+            List<Period> p = calculatePeriods(bookingDto.getPeriodRep(), bookingDto.getFinalDate(), bookingDto.getPeriod().getstartDate(), bookingDto.getPeriod().getEndDate());
             booking.setPeriod(p);
             booking.setPeriodRep(bookingDto.getPeriodRep());
             booking.setIsPeriodic(bookingDto.isIsPeriodic());
@@ -262,15 +238,13 @@ public class BookingService {
             }
             bookingRepository.save(booking);
 
-            return "Booking is update";
-        } else {
-            return "Booking not exists";
+            return true;
         }
-
+        return false; // 404
     }
 
     @Transactional
-    public String deleteBooking(long id) {
+    public Boolean deleteBooking(long id) {
 
         Optional<Booking> booking = bookingRepository.findById(id);
 
@@ -278,19 +252,14 @@ public class BookingService {
             Booking b = booking.get();
             b.setActive(false);
             bookingRepository.save(b);
-            return "Booking is deleted";
-        } else {
-            return "Booking not exist";
+            return true;
         }
-
-
+        return false; // Not found
     }
 
     public List<Booking> getAllBookings() {
 
-        List<Booking> booking = bookingRepository.findAll();
-
-        return booking;
+        return bookingRepository.findAll();
 
     }
 
@@ -299,35 +268,33 @@ public class BookingService {
     }
 
     @Transactional
-    public String validateBooking(long id) {
+    public Boolean validateBooking(long id) {
         Optional<Booking> booking = bookingRepository.findById(id);
         if (booking.isPresent()) {
             Booking b = booking.get();
             b.setState("valida");
             bookingRepository.save(b);
-            return "Booking is validate";
-        } else {
-            return "Booking not exist";
+            return true;
         }
+        return false;
     }
 
     @Transactional
-    public String cancelBooking(long id) {
+    public Boolean cancelBooking(long id) {
         Optional<Booking> booking = bookingRepository.findById(id);
         if (booking.isPresent()) {
             Booking b = booking.get();
             b.setState("invalida");
             b.setActive(false);
             bookingRepository.save(b);
-            return "Booking is canceled";
-        } else {
-            return "Booking not exist";
+            return true;
         }
+        return false;
+
     }
 
-    public long getIdUser (long id){
+    public long getBookingOwnerByID (long id) {
         Optional<Booking> booking = bookingRepository.findById(id);
-        long idUser = booking.get().getUser().getId();
-        return idUser;
+        return (booking.isPresent() ? booking.get().getUser().getId() : -1 );
     }
 }

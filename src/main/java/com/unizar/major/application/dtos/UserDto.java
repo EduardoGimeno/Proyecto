@@ -9,6 +9,7 @@ import java.util.List;
 
 public class UserDto {
 
+    @SuppressWarnings("SpellCheckingInspection")
     public enum Rol {
         ESTUDIANTE, PAS, ADMIN
     }

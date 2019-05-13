@@ -107,4 +107,9 @@ public class UserService {
         return Optional.empty();
     }
 
+    public boolean existsUserInSystem(UserDto userDto) {
+        return userRepository.findByUserName(userDto.getUserName()).isPresent() ||
+                userRepository.findByEmail(userDto.getEmail()).isPresent();
+    }
+
 }

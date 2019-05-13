@@ -3,7 +3,6 @@ package com.unizar.major.application.dtos;
 import com.unizar.major.domain.Period;
 import com.unizar.major.domain.Space;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -14,7 +13,7 @@ public class BookingDtoReturn {
 
     private String reason;
 
-    private Collection<Period> period;
+    private List<Period> period;
 
     private String state;
 
@@ -24,7 +23,7 @@ public class BookingDtoReturn {
 
     private Date finalDate;
 
-    private Collection<Space> spaces;
+    private List<Integer> spaces;
 
 
     public long getId() {
@@ -51,11 +50,11 @@ public class BookingDtoReturn {
         this.reason = reason;
     }
 
-    public Collection<Period> getPeriod() {
+    public List<Period> getPeriod() {
         return period;
     }
 
-    public void setPeriod(Collection<Period> period) {
+    public void setPeriod(List<Period> period) {
         this.period=period;
     }
 
@@ -91,11 +90,11 @@ public class BookingDtoReturn {
         this.active = active;
     }
 
-    public Collection<Space> getSpaces() {
+    public List<Integer> getSpaces() {
         return spaces;
     }
 
-    public void setSpaces(List<Space> spaces) {
+    public void setSpaces(List<Integer> spaces) {
         this.spaces = spaces;
     }
 }
