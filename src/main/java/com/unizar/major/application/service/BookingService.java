@@ -1,6 +1,7 @@
 package com.unizar.major.application.service;
 
 import com.unizar.major.application.dtos.BookingDto;
+import com.unizar.major.application.dtos.Bookingcsv;
 import com.unizar.major.domain.Booking;
 import com.unizar.major.domain.Period;
 import com.unizar.major.domain.Space;
@@ -32,6 +33,24 @@ public class BookingService {
     Logger logger = LoggerFactory.getLogger(BookingService.class);
 
     public BookingService() {
+    }
+
+    @Transactional
+    public Boolean createNewBooking(Long id, Bookingcsv bookingcsv) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            User u = user.get();
+            Booking booking = new Booking(false, bookingcsv.getReason(), bookingcsv.getPeriods());
+            booking.setUser(u);
+            booking.setState("valida");
+            for (int i : bookingcsv.getSpaces()) {
+                Optional<Space> space = spaceRepository.findByGid(i);
+                booking.setSpaces(space.get());
+            }
+            bookingRepository.save(booking);
+            return true;
+        }
+        return false;
     }
 
     @Transactional

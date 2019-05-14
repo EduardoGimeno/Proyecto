@@ -5,10 +5,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.QueueingConsumer;
-import com.unizar.major.application.dtos.BookingDto;
-import com.unizar.major.application.dtos.BookingDtoReturn;
-import com.unizar.major.application.dtos.LoginDto;
-import com.unizar.major.application.dtos.UserDto;
+import com.unizar.major.application.dtos.*;
 import com.unizar.major.application.service.BookingService;
 import com.unizar.major.application.service.UserService;
 import com.unizar.major.domain.Booking;
@@ -147,6 +144,9 @@ public class Receptor implements CommandLineRunner {
                     break;
                 case "cancelBookingById":
                     retMessage = cancelBookingById(messageParts[2]);
+                    break;
+                case "createCSVBooking":
+                    retMessage = createCSVBooking(messageParts[2]);
                     break;
                 default:
                     retMessage = "500;null";
@@ -376,6 +376,18 @@ public class Receptor implements CommandLineRunner {
             return (status ? "202;null" : "404;null");
         } catch (Exception e) {
             logger.error("cancelBookingById", e);
+            return "500;null";
+        }
+    }
+
+    private String createCSVBooking(String message) {
+        logger.info("createCSVBooking message received{" + message + "}");
+        String[] args = message.split("::");
+        try {
+            Boolean status = bookingService.createNewBooking(Long.parseLong(args[0]), new ObjectMapper().readValue(args[1], Bookingcsv.class));
+            return (status ? "201;null" : "404;null");
+        } catch (Exception e) {
+            logger.error("createCSVBooking", e);
             return "500;null";
         }
     }
