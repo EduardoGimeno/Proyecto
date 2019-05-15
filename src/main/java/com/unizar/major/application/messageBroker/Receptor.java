@@ -241,23 +241,27 @@ public class Receptor implements CommandLineRunner {
         }
     }
 
+    private BookingDtoReturn convertBookingIntoDto(Booking booking) {
+        BookingDtoReturn bdr = new BookingDtoReturn();
+        bdr.setIsPeriodic(booking.isIsPeriodic());
+        bdr.setReason(booking.getReason());
+        bdr.setPeriod(booking.getPeriod());
+        bdr.setState(booking.getState());
+        bdr.setActive(booking.isActive());
+        bdr.setPeriodRep(booking.getPeriodRep());
+        bdr.setFinalDate(booking.getFinalDate());
+        List<Integer> spaces = new ArrayList<>();
+        for (Space space: booking.getSpaces()) {
+            spaces.add(space.getGid());
+        }
+        bdr.setSpaces(spaces);
+        return bdr;
+    }
+
     private List<BookingDtoReturn> convertBookingListIntoDto(List<Booking> input) {
         List<BookingDtoReturn> output = new ArrayList<>();
         for(Booking booking : input) {
-            BookingDtoReturn bdr = new BookingDtoReturn();
-            bdr.setIsPeriodic(booking.isIsPeriodic());
-            bdr.setReason(booking.getReason());
-            bdr.setPeriod(booking.getPeriod());
-            bdr.setState(booking.getState());
-            bdr.setActive(booking.isActive());
-            bdr.setPeriodRep(booking.getPeriodRep());
-            bdr.setFinalDate(booking.getFinalDate());
-            /*List<Integer> spaces = new ArrayList<>();
-            for (Space space: booking.getSpaces()) {
-                spaces.add(space.getGid());
-            }
-            bdr.setSpaces(spaces);*/
-            output.add(bdr);
+            output.add(convertBookingIntoDto(booking));
             //output.add(new ModelMapper().map(booking, BookingDtoReturn.class));
         }
         return output;
@@ -279,7 +283,7 @@ public class Receptor implements CommandLineRunner {
         try {
             Optional booking = bookingService.getBookingById(Long.parseLong(message));
             if(booking.isPresent()) {
-                return "200;" + new ObjectMapper().writeValueAsString(new ModelMapper().map(booking.get(), BookingDtoReturn.class));
+                return "200;" + new ObjectMapper().writeValueAsString(new ModelMapper().map(convertBookingIntoDto((Booking) booking.get()), BookingDtoReturn.class));
             } else {
                 return "404;null";
             }

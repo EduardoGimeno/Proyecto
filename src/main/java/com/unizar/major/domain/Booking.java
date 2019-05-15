@@ -2,6 +2,8 @@ package com.unizar.major.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 
 import javax.persistence.*;
@@ -48,6 +50,7 @@ public class Booking {
     private boolean especial;
 
     @ManyToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
     @JoinTable(name ="booking_space",
     joinColumns = @JoinColumn(name="booking"),
     inverseJoinColumns = @JoinColumn(name="space_gid"))
