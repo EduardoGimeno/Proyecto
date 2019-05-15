@@ -7,6 +7,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.QueueingConsumer;
 import com.unizar.major.application.dtos.*;
 import com.unizar.major.application.service.BookingService;
+import com.unizar.major.application.service.SpaceService;
 import com.unizar.major.application.service.UserService;
 import com.unizar.major.domain.Booking;
 import com.unizar.major.domain.Space;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -55,6 +57,9 @@ public class Receptor implements CommandLineRunner {
     @Autowired
     UserService userService;
 
+    @Autowired
+    SpaceService spaceService;
+
     @Override
     public void run(String... args) throws Exception {
 
@@ -91,9 +96,6 @@ public class Receptor implements CommandLineRunner {
             QueueingConsumer.Delivery delivery = consumer.nextDelivery();
             String message = new String(delivery.getBody());
             String[] messageParts = message.split(";");
-            /*logger.info("Message received: \n\tResponse queue: " + messageParts[0] +
-                    "\n\tFunction: " + messageParts[1] +
-                    "\n\tArguments: " + (messageParts.length == 3 ? messageParts[2] : "No args"));*/
 
             String retMessage;
             switch (messageParts[1]) {
@@ -148,6 +150,18 @@ public class Receptor implements CommandLineRunner {
                 case "createCSVBooking":
                     retMessage = createCSVBooking(messageParts[2]);
                     break;
+                case "fetchAllSpaces":
+                    retMessage = fetchAllSpaces();
+                    break;
+                case "fetchSpaceByID":
+                    retMessage = fetchSpaceByID(messageParts[2]);
+                    break;
+                case "putSpaceByID":
+                    retMessage = putSpaceByID(messageParts[2]);
+                    break;
+                case "fetchSpaceBookingsByID":
+                    retMessage = fetchSpaceBookingsByID(messageParts[2]);
+                    break;
                 default:
                     retMessage = "500;null";
                     logger.error("Message not recognized");
@@ -157,6 +171,59 @@ public class Receptor implements CommandLineRunner {
             logger.info(" Message send: {" + retMessage + "}");
             channel.basicPublish("", messageParts[0], null, retMessage.getBytes());
         }
+    }
+
+    private BookingDtoReturn convertBookingIntoDto(Booking booking) {
+        BookingDtoReturn bdr = new BookingDtoReturn();
+        bdr.setId(booking.getId());
+        bdr.setIsPeriodic(booking.isIsPeriodic());
+        bdr.setReason(booking.getReason());
+        bdr.setPeriod(booking.getPeriod());
+        bdr.setState(booking.getState());
+        bdr.setActive(booking.isActive());
+        bdr.setPeriodRep(booking.getPeriodRep());
+        bdr.setFinalDate(booking.getFinalDate());
+        List<Integer> spaces = new ArrayList<>();
+        for (Space space: booking.getSpaces()) {
+            spaces.add(space.getGid());
+        }
+        bdr.setSpaces(spaces);
+        return bdr;
+    }
+
+    private List<BookingDtoReturn> convertBookingListIntoDto(List<Booking> input) {
+        List<BookingDtoReturn> output = new ArrayList<>();
+        for(Booking booking : input) {
+            output.add(convertBookingIntoDto(booking));
+            //output.add(new ModelMapper().map(booking, BookingDtoReturn.class));
+        }
+        return output;
+    }
+
+    private SpaceDto convertSpaceIntoDto(Space space) {
+        SpaceDto spaceDto = new SpaceDto();
+        spaceDto.setId(space.getId());
+        spaceDto.setGid(space.getGid());
+        spaceDto.setLayer(space.getLayer());
+        spaceDto.setSubclasses(space.getSubclasses());
+        spaceDto.setExtendeden(space.getExtendeden());
+        spaceDto.setLinetype(space.getLinetype());
+        spaceDto.setEntityhand(space.getEntityhand());
+        spaceDto.setText(space.getText());
+        spaceDto.setArea(space.getArea());
+        spaceDto.setPerimeter(space.getPerimeter());
+        spaceDto.setDataSpace(space.getDataSpace());
+        spaceDto.setMaterials(space.getMaterials());
+        spaceDto.setBookings(convertBookingListIntoDto(space.getBookings()));
+        return spaceDto;
+    }
+
+    private List<SpaceDto> convertSpaceListIntoDto(List<Space> input) {
+        List<SpaceDto> output = new ArrayList<>();
+        for(Space space : input) {
+            output.add(convertSpaceIntoDto(space));
+        }
+        return output;
     }
 
     private String login(String message) {
@@ -195,6 +262,7 @@ public class Receptor implements CommandLineRunner {
         try {
             Optional fetchedUser = userService.getUser(Long.parseLong(message));
             if (fetchedUser.isPresent()) {
+                ((User) fetchedUser.get()).setPassword(null);
                 return "200;" + new ObjectMapper().writeValueAsString(new ModelMapper().map(fetchedUser.get(), UserDto.class));
             }
             return "404;null";
@@ -239,32 +307,6 @@ public class Receptor implements CommandLineRunner {
             logger.error("fetchUserBookingsByID", e);
             return "500;null";
         }
-    }
-
-    private BookingDtoReturn convertBookingIntoDto(Booking booking) {
-        BookingDtoReturn bdr = new BookingDtoReturn();
-        bdr.setIsPeriodic(booking.isIsPeriodic());
-        bdr.setReason(booking.getReason());
-        bdr.setPeriod(booking.getPeriod());
-        bdr.setState(booking.getState());
-        bdr.setActive(booking.isActive());
-        bdr.setPeriodRep(booking.getPeriodRep());
-        bdr.setFinalDate(booking.getFinalDate());
-        List<Integer> spaces = new ArrayList<>();
-        for (Space space: booking.getSpaces()) {
-            spaces.add(space.getGid());
-        }
-        bdr.setSpaces(spaces);
-        return bdr;
-    }
-
-    private List<BookingDtoReturn> convertBookingListIntoDto(List<Booking> input) {
-        List<BookingDtoReturn> output = new ArrayList<>();
-        for(Booking booking : input) {
-            output.add(convertBookingIntoDto(booking));
-            //output.add(new ModelMapper().map(booking, BookingDtoReturn.class));
-        }
-        return output;
     }
 
     private String getUserIDOfBooking(String message) {
@@ -392,6 +434,59 @@ public class Receptor implements CommandLineRunner {
             return (status ? "201;null" : "404;null");
         } catch (Exception e) {
             logger.error("createCSVBooking", e);
+            return "500;null";
+        }
+    }
+
+    private String fetchAllSpaces() {
+        logger.info("fetchAllSpaces message received{ no args }");
+        try {
+            List<Space> spaces = spaceService.getAllSpaces();
+            return "200;" + new ObjectMapper().writeValueAsString(convertSpaceListIntoDto(spaces));
+        } catch (Exception e) {
+            logger.error("fetchAllSpaces", e);
+            return "500;null";
+        }
+    }
+
+    private String fetchSpaceByID(String message) {
+        logger.info("fetchSpaceByID message received{" + message + "}");
+        try {
+            Optional space = spaceService.getSpaceByGid(Integer.parseInt(message));
+            if(space.isPresent()) {
+                return "200;" + new ObjectMapper().writeValueAsString(new ModelMapper().map(convertSpaceIntoDto((Space) space.get()), SpaceDto.class));
+            } else {
+                return "404;null";
+            }
+        } catch (Exception e) {
+            logger.error("fetchSpaceByID", e);
+            return "500;null";
+        }
+    }
+
+    private String putSpaceByID(String message) {
+        logger.info("putSpaceByID message received{" + message + "}");
+        String[] args = message.split("::");
+        try {
+            Boolean status = spaceService.updateInfoSpace(Integer.parseInt(args[0]), new ObjectMapper().readValue(args[1], SpaceInfoDto.class));
+            return (status ? "202;null" : "404;null");
+        } catch (Exception e) {
+            logger.error("putSpaceByID", e);
+            return "500;null";
+        }
+    }
+
+    private String fetchSpaceBookingsByID(String message) {
+        logger.info("fetchSpaceBookingsByID message received{" + message + "}");
+        try {
+            List<Booking> bookings = spaceService.getBookingByIdSpace(Integer.parseInt(message));
+            if(bookings != null) {
+                return "200;" + new ObjectMapper().writeValueAsString(convertBookingListIntoDto(bookings));
+            } else {
+                return "404;null";
+            }
+        } catch (Exception e) {
+            logger.error("fetchSpaceBookingsByID", e);
             return "500;null";
         }
     }

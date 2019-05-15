@@ -31,17 +31,22 @@ public class SpaceService {
 
     public List<Booking> getBookingByIdSpace(int id){
         Optional<Space> space = spaceRepository.findByGid(id);
-        return space.get().getBookings();
+        if(space.isPresent()) {
+            return space.get().getBookings();
+        }
+        return null;
     }
 
-    public Space updateInfoSpace(int id, SpaceInfoDto spaceInfoDto){
+    public Boolean updateInfoSpace(int id, SpaceInfoDto spaceInfoDto){
         Optional<Space> space = spaceRepository.findByGid(id);
-        Space s = space.get();
-        Materials materials = new Materials(spaceInfoDto.isProyector(), spaceInfoDto.getPizarra(),spaceInfoDto.isPantalla(),spaceInfoDto.getOrdenadores(), spaceInfoDto.getSillas(), spaceInfoDto.getMesas());
-        s.setMaterials(materials);
-        spaceRepository.save(s);
-
-        return s;
+        if(space.isPresent()) {
+            Space s = space.get();
+            Materials materials = new Materials(spaceInfoDto.isProyector(), spaceInfoDto.getPizarra(),spaceInfoDto.isPantalla(),spaceInfoDto.getOrdenadores(), spaceInfoDto.getSillas(), spaceInfoDto.getMesas());
+            s.setMaterials(materials);
+            spaceRepository.save(s);
+            return true;
+        }
+        return false;
 
     }
 

@@ -7,7 +7,6 @@ import org.springframework.context.annotation.ComponentScan;
 
 @ComponentScan
 @EnableAutoConfiguration
-//@SpringBootApplication
 public class MajorApplication {
 
 	public static void main(String[] args) {

@@ -4,13 +4,13 @@ package com.unizar.major.domain;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vividsolutions.jts.geom.MultiPolygon;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 
 import java.util.List;
-
-
 
 @Entity
 @Table (name = "espacios")
@@ -38,7 +38,8 @@ public class Space {
     @Embedded
     private Materials materials;
 
-    @ManyToMany//(mappedBy="spaces",fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy="spaces")//,fetch = FetchType.EAGER)
+    @LazyCollection(LazyCollectionOption.FALSE)
     @JsonBackReference
     private List<Booking> bookings;
 
@@ -168,7 +169,6 @@ public class Space {
         if(!this.bookings.contains(booking)) {
             this.bookings.add(booking);
         }
-
 
     }
 

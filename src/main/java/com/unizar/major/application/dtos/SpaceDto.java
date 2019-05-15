@@ -21,7 +21,7 @@ public class SpaceDto {
     private DataSpace dataSpace;
     private Materials materials;
 
-    private List<Booking> bookings;
+    private List<BookingDtoReturn> bookings;
 
     public String getId() {
         return id;
@@ -111,11 +111,11 @@ public class SpaceDto {
         this.dataSpace = dataSpace;
     }
 
-    public List<Booking> getBookings() {
+    public List<BookingDtoReturn> getBookings() {
         return bookings;
     }
 
-    public void setBookings(List<Booking> bookings) {
+    public void setBookings(List<BookingDtoReturn> bookings) {
         this.bookings = bookings;
     }
 
