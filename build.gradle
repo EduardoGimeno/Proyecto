@@ -40,6 +40,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
 	implementation 'org.postgresql:postgresql:9.4-1206-jdbc42'
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	compileOnly 'org.projectlombok:lombok'
 	compile 'org.springframewor.security.oauth.boot:spring-security-oauth2-autoconfigure:2.0.1.RELEASE'
 	compile 'org.okta.spring:okta-spring-boot-starter:0.6.1'

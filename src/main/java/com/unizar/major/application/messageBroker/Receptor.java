@@ -7,6 +7,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.QueueingConsumer;
 import com.unizar.major.application.dtos.*;
 import com.unizar.major.application.service.BookingService;
+import com.unizar.major.application.service.EmailService;
 import com.unizar.major.application.service.SpaceService;
 import com.unizar.major.application.service.UserService;
 import com.unizar.major.domain.Booking;
@@ -59,6 +60,9 @@ public class Receptor implements CommandLineRunner {
 
     @Autowired
     SpaceService spaceService;
+
+    @Autowired
+    EmailService emailService;
 
     @Override
     public void run(String... args) throws Exception {
@@ -407,8 +411,12 @@ public class Receptor implements CommandLineRunner {
     private String validateBookingById(String message) {
         logger.info("validateBookingById message received{" + message + "}");
         try {
-            Boolean status = bookingService.validateBooking(Long.parseLong(message));
-            return (status ? "202;null" : "404;null");
+            Optional<Booking> booking = bookingService.validateBooking(Long.parseLong(message));
+            if(booking.isPresent()) {
+                emailService.sendSimpleEmail(/*booking.get().getUser().getEmail()*/ "yorch044zgz@gmail.com", "Reserva confirmada", "La siguiente reserva acaba de ser confirmada" + new ObjectMapper().writeValueAsString(convertBookingIntoDto(booking.get())));
+                return "200;null";
+            }
+            return "404;null";
         } catch (Exception e) {
             logger.error("validateBookingById", e);
             return "500;null";
@@ -418,8 +426,12 @@ public class Receptor implements CommandLineRunner {
     private String cancelBookingById(String message) {
         logger.info("cancelBookingById message received{" + message + "}");
         try {
-            Boolean status = bookingService.cancelBooking(Long.parseLong(message));
-            return (status ? "202;null" : "404;null");
+            Optional<Booking> booking = bookingService.cancelBooking(Long.parseLong(message));
+            if(booking.isPresent()) {
+                emailService.sendSimpleEmail(booking.get().getUser().getEmail(), "Reserva Denegaga", "La siguiente reserva acaba de ser confirmada" + new ObjectMapper().writeValueAsString(convertBookingIntoDto(booking.get())));
+                return "200;null";
+            }
+            return "404;null";
         } catch (Exception e) {
             logger.error("cancelBookingById", e);
             return "500;null";

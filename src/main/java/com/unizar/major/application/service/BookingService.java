@@ -387,28 +387,28 @@ public class BookingService {
     }
 
     @Transactional
-    public Boolean validateBooking(long id) {
+    public Optional<Booking> validateBooking(long id) {
         Optional<Booking> booking = bookingRepository.findById(id);
         if (booking.isPresent()) {
             Booking b = booking.get();
             b.setState("valida");
             bookingRepository.save(b);
-            return true;
+            return booking;
         }
-        return false;
+        return Optional.empty();
     }
 
     @Transactional
-    public Boolean cancelBooking(long id) {
+    public Optional<Booking> cancelBooking(long id) {
         Optional<Booking> booking = bookingRepository.findById(id);
         if (booking.isPresent()) {
             Booking b = booking.get();
             b.setState("invalida");
             b.setActive(false);
             bookingRepository.save(b);
-            return true;
+            return booking;
         }
-        return false;
+        return Optional.empty();
 
     }
 
