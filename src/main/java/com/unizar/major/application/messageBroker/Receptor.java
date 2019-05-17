@@ -413,8 +413,14 @@ public class Receptor implements CommandLineRunner {
         try {
             Optional<Booking> booking = bookingService.validateBooking(Long.parseLong(message));
             if(booking.isPresent()) {
-                emailService.sendSimpleEmail(/*booking.get().getUser().getEmail()*/ "yorch044zgz@gmail.com", "Reserva confirmada", "La siguiente reserva acaba de ser confirmada" + new ObjectMapper().writeValueAsString(convertBookingIntoDto(booking.get())));
-                return "200;null";
+                long userID = bookingService.getBookingOwnerByID(booking.get().getId());
+                if( userID != -1) {
+                    Optional<User> user = userService.getUser(userID);
+                    if(user.isPresent()) {
+                        emailService.sendSimpleEmail(user.get().getEmail(), "Reserva confirmada", "La siguiente reserva acaba de ser confirmada" + new ObjectMapper().writeValueAsString(convertBookingIntoDto(booking.get())));
+                        return "200;null";
+                    }
+                }
             }
             return "404;null";
         } catch (Exception e) {
@@ -428,8 +434,14 @@ public class Receptor implements CommandLineRunner {
         try {
             Optional<Booking> booking = bookingService.cancelBooking(Long.parseLong(message));
             if(booking.isPresent()) {
-                emailService.sendSimpleEmail(booking.get().getUser().getEmail(), "Reserva Denegaga", "La siguiente reserva acaba de ser confirmada" + new ObjectMapper().writeValueAsString(convertBookingIntoDto(booking.get())));
-                return "200;null";
+                long userID = bookingService.getBookingOwnerByID(booking.get().getId());
+                if (userID != -1) {
+                    Optional<User> user = userService.getUser(userID);
+                    if (user.isPresent()) {
+                        emailService.sendSimpleEmail(user.get().getEmail(), "Reserva Denegada", "La siguiente reserva acaba de ser denegada" + new ObjectMapper().writeValueAsString(convertBookingIntoDto(booking.get())));
+                        return "200;null";
+                    }
+                }
             }
             return "404;null";
         } catch (Exception e) {

@@ -147,7 +147,7 @@ public class BookingService {
 
         if (fecha_ini.after(hoy)){
 
-            if (user_rol==User.Rol.PAS) {
+            if (user_rol==User.Rol.PDI) {
                 if (bookingDto.isIsPeriodic()){
                     if (fecha_ini.after(calendar_mes)) {
                         cumplePolitica = false;
@@ -389,7 +389,7 @@ public class BookingService {
     @Transactional
     public Optional<Booking> validateBooking(long id) {
         Optional<Booking> booking = bookingRepository.findById(id);
-        if (booking.isPresent()) {
+        if (booking.isPresent() && booking.get().getState().equalsIgnoreCase("inicial")) {
             Booking b = booking.get();
             b.setState("valida");
             bookingRepository.save(b);
@@ -401,7 +401,7 @@ public class BookingService {
     @Transactional
     public Optional<Booking> cancelBooking(long id) {
         Optional<Booking> booking = bookingRepository.findById(id);
-        if (booking.isPresent()) {
+        if (booking.isPresent() && !booking.get().getState().equalsIgnoreCase("inicial")) {
             Booking b = booking.get();
             b.setState("invalida");
             b.setActive(false);
@@ -415,5 +415,10 @@ public class BookingService {
     public long getBookingOwnerByID (long id) {
         Optional<Booking> booking = bookingRepository.findById(id);
         return (booking.isPresent() ? booking.get().getUser().getId() : -1 );
+    }
+
+    public User getBookingUserByID(long id) {
+        Optional<Booking> booking = bookingRepository.findById(id);
+        return (booking.isPresent() ? booking.get().getUser() : null);
     }
 }

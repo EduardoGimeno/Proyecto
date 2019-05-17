@@ -11,7 +11,7 @@ import java.util.List;
 public class User{
 
     public enum Rol {
-        ESTUDIANTE, PAS, ADMIN
+        ESTUDIANTE, PDI, ADMIN
     }
 
     @Id
