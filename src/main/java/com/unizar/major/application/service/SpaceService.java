@@ -47,7 +47,24 @@ public class SpaceService {
             return true;
         }
         return false;
+    }
 
+    public Optional<Space> getSpaceByCoords(int floor, double X, double Y) {
+        return spaceRepository.findByCoords(floor, X, Y);
+    }
+
+    public List<Space> getSpacesQuery(int chairs, double area) {
+        area = area*10000; // converto to cm²
+        if(chairs == 0) {
+            // SEARCH ONLY AREA
+            return spaceRepository.findByArea(area);
+        }
+        if(area == 0) {
+            // SEARCH ONLY CHAIRS
+            return spaceRepository.findByChairs(chairs);
+        }
+        // SEARCH BOTH
+        return getSpacesQuery(chairs, area);
     }
 
 }

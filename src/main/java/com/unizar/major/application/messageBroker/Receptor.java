@@ -155,7 +155,7 @@ public class Receptor implements CommandLineRunner {
                     retMessage = createCSVBooking(messageParts[2]);
                     break;
                 case "fetchAllSpaces":
-                    retMessage = fetchAllSpaces();
+                    retMessage = fetchAllSpaces(messageParts[2]);
                     break;
                 case "fetchSpaceByID":
                     retMessage = fetchSpaceByID(messageParts[2]);
@@ -165,6 +165,9 @@ public class Receptor implements CommandLineRunner {
                     break;
                 case "fetchSpaceBookingsByID":
                     retMessage = fetchSpaceBookingsByID(messageParts[2]);
+                    break;
+                case "fetchSpaceBookingsByCoords":
+                    retMessage = fetchSpaceBookingsByCoords(messageParts[2]);
                     break;
                 default:
                     retMessage = "500;null";
@@ -462,10 +465,17 @@ public class Receptor implements CommandLineRunner {
         }
     }
 
-    private String fetchAllSpaces() {
-        logger.info("fetchAllSpaces message received{ no args }");
+    private String fetchAllSpaces(String message) {
+        logger.info("fetchAllSpaces message received{ " + message + " }");
+        String[] args = message.split("::");
         try {
-            List<Space> spaces = spaceService.getAllSpaces();
+            List<Space> spaces;
+            if(Integer.parseInt(args[0]) == 0 && Double.parseDouble(args[1]) == 0) {
+                spaces = spaceService.getAllSpaces();
+            } else {
+                spaces = spaceService.getSpacesQuery(Integer.parseInt(args[0]), Double.parseDouble(args[1]));
+            }
+
             return "200;" + new ObjectMapper().writeValueAsString(convertSpaceListIntoDto(spaces));
         } catch (Exception e) {
             logger.error("fetchAllSpaces", e);
@@ -511,6 +521,22 @@ public class Receptor implements CommandLineRunner {
             }
         } catch (Exception e) {
             logger.error("fetchSpaceBookingsByID", e);
+            return "500;null";
+        }
+    }
+
+    private String fetchSpaceBookingsByCoords(String message) {
+        logger.info("fetchSpaceBookingsByCoords message received{" + message + "}");
+        try {
+            String[] args = message.split("::");
+            Optional<Space> space = spaceService.getSpaceByCoords(Integer.parseInt(args[0]), Double.parseDouble(args[1]), Double.parseDouble(args[2]));
+            if(space.isPresent()) {
+                return "200;" + new ObjectMapper().writeValueAsString(convertSpaceIntoDto(space.get()));
+            } else {
+                return "404;null";
+            }
+        } catch (Exception e) {
+            logger.error("fetchSpaceBookingsByCoords", e);
             return "500;null";
         }
     }
