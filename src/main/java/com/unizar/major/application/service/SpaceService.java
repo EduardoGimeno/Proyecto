@@ -41,12 +41,35 @@ public class SpaceService {
         Optional<Space> space = spaceRepository.findByGid(id);
         if(space.isPresent()) {
             Space s = space.get();
-            Materials materials = new Materials(spaceInfoDto.isProyector(), spaceInfoDto.getPizarra(),spaceInfoDto.isPantalla(),spaceInfoDto.getOrdenadores(), spaceInfoDto.getSillas(), spaceInfoDto.getMesas());
-            s.setMaterials(materials);
-            spaceRepository.save(s);
+            if (cumplePolitica(spaceInfoDto, space.get().getArea())){
+                Materials materials = new Materials(spaceInfoDto.isProyector(), spaceInfoDto.getPizarra(),spaceInfoDto.isPantalla(),spaceInfoDto.getOrdenadores(), spaceInfoDto.getSillas(), spaceInfoDto.getMesas());
+                s.setMaterials(materials);
+                spaceRepository.save(s);
+                return true;
+            }
+            else{
+                return false;
+            }
+
+        }
+        else{
+            return false;
+        }
+    }
+
+    public boolean cumplePolitica(SpaceInfoDto spaceInfoDto, double area){
+        double area_m2 = area/10000;
+        double espacio_sillas = spaceInfoDto.getSillas() * 0.5;
+        double espacio_mesas = spaceInfoDto.getMesas() * 2;
+        double espacio_libre = (area_m2 * 10)/100;
+        double area_restante = area_m2 - espacio_libre - espacio_mesas - espacio_sillas;
+
+        if (area_restante>= 0){
             return true;
         }
-        return false;
+        else{
+            return false;
+        }
     }
 
     public Optional<Space> getSpaceByCoords(int floor, double X, double Y) {
