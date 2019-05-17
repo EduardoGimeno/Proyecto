@@ -92,7 +92,7 @@ public class SpaceDto {
     }
 
     public void setArea(double area) {
-        this.area = area;
+        this.area = area/10000;
     }
 
     public double getPerimeter() {
