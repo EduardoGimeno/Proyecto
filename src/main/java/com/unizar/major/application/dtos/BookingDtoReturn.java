@@ -1,7 +1,6 @@
 package com.unizar.major.application.dtos;
 
 import com.unizar.major.domain.Period;
-import com.unizar.major.domain.Space;
 
 import java.util.Date;
 import java.util.List;
@@ -105,6 +104,6 @@ public class BookingDtoReturn {
     }
 
     public void setEspecial(boolean especial) {
-        especial = especial;
+        this.especial = especial;
     }
 }
