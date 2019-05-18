@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -175,7 +174,7 @@ public class Receptor implements CommandLineRunner {
                     break;
             }
 
-            logger.info(" Message send: {" + retMessage + "}");
+            logger.info("Message send: {" + retMessage + "}");
             channel.basicPublish("", messageParts[0], null, retMessage.getBytes());
         }
     }
@@ -202,7 +201,6 @@ public class Receptor implements CommandLineRunner {
         List<BookingDtoReturn> output = new ArrayList<>();
         for(Booking booking : input) {
             output.add(convertBookingIntoDto(booking));
-            //output.add(new ModelMapper().map(booking, BookingDtoReturn.class));
         }
         return output;
     }
