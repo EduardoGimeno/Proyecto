@@ -69,6 +69,7 @@ public class BookingService {
                 booking.setState("inicial");
                 booking.setFinalDate(null);
                 booking.setPeriodRep(null);
+                booking.setEspecial(bookingDto.isEspecial());
                 booking.setUser(u);
 
                 for (int i = 0; i < bookingDto.getSpaces().size(); i++) {
@@ -105,6 +106,7 @@ public class BookingService {
                 booking.setActive(true);
                 booking.setState("inicial");
                 booking.setUser(u);
+                booking.setEspecial(bookingDto.isEspecial());
 
                 for (int i = 0; i < bookingDto.getSpaces().size(); i++) {
                     Optional<Space> space = spaceRepository.findByGid(bookingDto.getSpaces().get(i));

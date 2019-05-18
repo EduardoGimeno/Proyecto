@@ -169,6 +169,9 @@ public class Receptor implements CommandLineRunner {
                 case "fetchSpaceBookingsByCoords":
                     retMessage = fetchSpaceBookingsByCoords(messageParts[2]);
                     break;
+                case "fetchSpaceCalendar":
+                    retMessage = fetchSpaceCalendar(messageParts[2]);
+                    break;
                 default:
                     retMessage = "500;null";
                     logger.error("Message not recognized");
@@ -538,6 +541,17 @@ public class Receptor implements CommandLineRunner {
         } catch (Exception e) {
             logger.error("fetchSpaceBookingsByCoords", e);
             return "500;null";
+        }
+    }
+
+    public String fetchSpaceCalendar(String message){
+        logger.info("fetchSpaceCalendar message received{" + message + "}");
+        try{
+            List<SpaceHorarioDto> horario = spaceService.getCalendarSpace(Integer.parseInt(message));
+            return "200;" + new ObjectMapper().writeValueAsString(horario);
+        }catch (Exception e){
+            logger.error("fetchSpaceCalendar",e);
+            return "500,null";
         }
     }
 }
