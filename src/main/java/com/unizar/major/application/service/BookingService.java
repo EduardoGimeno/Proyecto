@@ -45,7 +45,7 @@ public class BookingService {
             booking.setState("valida");
             for (int i : bookingcsv.getSpaces()) {
                 Optional<Space> space = spaceRepository.findByGid(i);
-                booking.setSpaces(space.get());
+                space.ifPresent(booking::setSpaces);
             }
             bookingRepository.save(booking);
             return true;
@@ -74,7 +74,7 @@ public class BookingService {
 
                 for (int i = 0; i < bookingDto.getSpaces().size(); i++) {
                     Optional<Space> space = spaceRepository.findByGid(bookingDto.getSpaces().get(i));
-                    booking.setSpaces(space.get());
+                    space.ifPresent(booking::setSpaces);
                 }
 
                 booking.setEspecial(bookingDto.isEspecial());
@@ -214,7 +214,7 @@ public class BookingService {
 
     }
 
-    public List<Period> calculatePeriods(String periodRep, Date finalDate, Date startDate, Date endDate) {
+    private List<Period> calculatePeriods(String periodRep, Date finalDate, Date startDate, Date endDate) {
 
 
         List<Period> p = new ArrayList<>();
@@ -353,7 +353,7 @@ public class BookingService {
             booking.getSpaces().clear();
             for (int i = 0; i < bookingDto.getSpaces().size(); i++) {
                 Optional<Space> space = spaceRepository.findByGid(bookingDto.getSpaces().get(i));
-                booking.setSpaces(space.get());
+                space.ifPresent(booking::setSpaces);
             }
             bookingRepository.save(booking);
 
@@ -419,6 +419,6 @@ public class BookingService {
 
     public PersonaEina getBookingUserByID(long id) {
         Optional<Booking> booking = bookingRepository.findById(id);
-        return (booking.isPresent() ? booking.get().getPersonaEina() : null);
+        return (booking.map(Booking::getPersonaEina).orElse(null));
     }
 }
