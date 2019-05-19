@@ -186,20 +186,15 @@ public class BookingService {
                                     Calendar fin = Calendar.getInstance();
                                     fin.setTime(booking.getPeriod().get(k).getEndDate());
 
-                                    if (ini.equals(initialDate)) {
-                                        keepPolicy = false;
-                                    } else if (initialDate.after(ini) && endDate.before(fin)) {
-                                        keepPolicy = false;
-                                    } else if (endDate.after(ini) && endDate.before(fin)) {
-                                        keepPolicy = false;
-                                    } else if (initialDate.after(ini) && initialDate.before(fin)) {
-                                        keepPolicy = false;
-                                    } else if (fin.equals(endDate)) {
-                                        keepPolicy = false;
-                                    } else if (initialDate.before(ini) && endDate.after(fin)) {
+                                    if (ini.equals(initialDate) ||
+                                            (initialDate.after(ini) && endDate.before(fin)) ||
+                                            (endDate.after(ini) && endDate.before(fin)) ||
+                                            (initialDate.after(ini) && initialDate.before(fin)) ||
+                                            (fin.equals(endDate)) ||
+                                            (initialDate.before(ini) && endDate.after(fin))) {
+
                                         keepPolicy = false;
                                     }
-
                                 }
                             }
                         }
