@@ -1,6 +1,6 @@
 language: java
 jdk:
-  - oraclejdk9
+  - openjdk8
 addons:
   sonarcloud:
     organization: unizar-30249-2018-major
