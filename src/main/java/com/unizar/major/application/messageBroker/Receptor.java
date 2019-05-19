@@ -94,13 +94,13 @@ public class Receptor implements CommandLineRunner {
 
         channel.basicConsume(REQUEST_QUEUE, true, consumer);
 
-        //noinspection InfiniteLoopStatement
-        while (true) {
+        boolean loopState = true;
+        while (loopState) {
             QueueingConsumer.Delivery delivery = consumer.nextDelivery();
             String message = new String(delivery.getBody());
             String[] messageParts = message.split(";");
 
-            String retMessage;
+            String retMessage = "";
             switch (messageParts[1]) {
                 case "login":
                     retMessage = login(messageParts[2]);
@@ -170,6 +170,9 @@ public class Receptor implements CommandLineRunner {
                     break;
                 case "fetchSpaceCalendar":
                     retMessage = fetchSpaceCalendar(messageParts[2]);
+                    break;
+                case "endBrokerMessageJustNow":
+                    loopState = false;
                     break;
                 default:
                     retMessage = "500;null";

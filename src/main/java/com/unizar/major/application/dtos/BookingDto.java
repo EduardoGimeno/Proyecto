@@ -81,7 +81,7 @@ public class BookingDto {
     }
 
     public void setEspecial(boolean especial) {
-        especial = especial;
+        this.especial = especial;
     }
 
     public List<Integer> getSpaces() {
