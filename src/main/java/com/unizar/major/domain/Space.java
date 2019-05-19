@@ -47,21 +47,6 @@ public class Space {
 
     }
 
-    public Space(String id, int gid, String layer, String subclasses, String extendeden, String linetype, String entityhand, String text, double area, double perimeter, MultiPolygon geom, DataSpace dataSpace) {
-        this.id = id;
-        this.gid = gid;
-        this.layer = layer;
-        this.subclasses = subclasses;
-        this.extendeden = extendeden;
-        this.linetype = linetype;
-        this.entityhand = entityhand;
-        this.text = text;
-        this.area = area;
-        this.perimeter = perimeter;
-        this.geom = geom;
-        this.dataSpace = dataSpace;
-    }
-
     public String getId() {
         return id;
     }

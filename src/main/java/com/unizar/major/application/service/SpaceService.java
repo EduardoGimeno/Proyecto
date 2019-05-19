@@ -32,10 +32,7 @@ public class SpaceService {
 
     public List<Booking> getBookingByIdSpace(int id) {
         Optional<Space> space = spaceRepository.findByGid(id);
-        if (space.isPresent()) {
-            return space.get().getBookings();
-        }
-        return null;
+        return space.map(Space::getBookings).orElse(null);
     }
 
     public Boolean updateInfoSpace(int id, SpaceInfoDto spaceInfoDto) {
@@ -81,7 +78,8 @@ public class SpaceService {
             return spaceRepository.findByChairs(chairs);
         }
         // SEARCH BOTH
-        return getSpacesQuery(chairs, area);
+
+        return spaceRepository.findByChairsAndArea(chairs, area);
     }
 
     public List<SpaceTimetableDto> getCalendarSpace(int id) {

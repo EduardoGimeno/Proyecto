@@ -16,7 +16,7 @@ public interface SpaceRepository extends JpaRepository<Space, String> {
     Optional<Space> findByGid(int id);
 
     @Query(value = "SELECT * FROM espacios e WHERE ST_contains(e.geom, ST_MakePoint(:X, :Y)) AND e.planta = :floor", nativeQuery = true)
-    Optional<Space> findByCoords(@Param("floor") int floor, @Param("X") double X, @Param("Y") double Y);
+    Optional<Space> findByCoords(@Param("floor") int floor, @Param("X") double x, @Param("Y") double y);
 
     @Query(value = "SELECT * FROM espacios e WHERE e.chairs >= :chairs", nativeQuery = true)
     List<Space> findByChairs(@Param("chairs") int chairs);
