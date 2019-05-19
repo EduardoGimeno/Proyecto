@@ -1,19 +1,5 @@
 package com.unizar.major.infrastructure.controller;
 
-import com.unizar.major.application.dtos.BookingDtoReturn;
-import com.unizar.major.application.service.UserService;
-import com.unizar.major.domain.Booking;
-import com.unizar.major.application.dtos.BookingDto;
-import com.unizar.major.application.service.BookingService;
-import com.unizar.major.domain.User;
-import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.text.ParseException;
-import java.util.*;
 /*
 @RestController
 public class BookingController {
@@ -23,7 +9,7 @@ public class BookingController {
     BookingService bookingService;
 
     @Autowired
-    UserService userService;
+    PersonaEinaService userService;
 
     Logger logger = LoggerFactory.getLogger(BookingService.class);
 
@@ -31,10 +17,10 @@ public class BookingController {
 
     public String createNewBooking(@RequestParam("id") Long id,@RequestBody BookingDto bookingDto){
 
-        Optional <User> u = userService.getUser(id);
+        Optional <PersonaEina> u = userService.getPersonaEina(id);
 
         if (u == null){
-            return "User not exists";
+            return "PersonaEina not exists";
         }
         else{
             if (u.get().isActive()){
@@ -59,7 +45,7 @@ public class BookingController {
 
             }
             else{
-                return "User is not active in the system";
+                return "PersonaEina is not active in the system";
             }
 
         }

@@ -1,7 +1,7 @@
 package com.unizar.major.application.service;
 
-import com.unizar.major.application.dtos.SpaceHorarioDto;
 import com.unizar.major.application.dtos.SpaceInfoDto;
+import com.unizar.major.application.dtos.SpaceTimetableDto;
 import com.unizar.major.domain.Booking;
 import com.unizar.major.domain.Materials;
 import com.unizar.major.domain.Period;
@@ -88,10 +88,10 @@ public class SpaceService {
         return getSpacesQuery(chairs, area);
     }
 
-    public List<SpaceHorarioDto> getCalendarSpace(int id) {
+    public List<SpaceTimetableDto> getCalendarSpace(int id) {
 
         String estado = "libre";
-        List<SpaceHorarioDto> horarios = new ArrayList<>();
+        List<SpaceTimetableDto> horarios = new ArrayList<>();
         Optional<Space> space = spaceRepository.findByGid(id);
         List<Booking> bookings = space.get().getBookings();
 
@@ -117,9 +117,9 @@ public class SpaceService {
 
             for (int i = 0; fecha_ini.before(calendar_hora); i++){
                 estado = "libre";
-                SpaceHorarioDto spaceHorarioDto = new SpaceHorarioDto();
+                SpaceTimetableDto spaceTimetableDto = new SpaceTimetableDto();
                 Period period = new Period(fecha_ini.getTime(), fecha_fin.getTime());
-                spaceHorarioDto.setPeriod(period);
+                spaceTimetableDto.setPeriod(period);
 
                 if (!bookings.isEmpty()) {
 
@@ -158,8 +158,8 @@ public class SpaceService {
                 } else{
                     estado="libre";
                 }
-                spaceHorarioDto.setState(estado);
-                horarios.add(spaceHorarioDto);
+                spaceTimetableDto.setState(estado);
+                horarios.add(spaceTimetableDto);
                 fecha_ini.add(Calendar.HOUR_OF_DAY,1);
                 fecha_fin.add(Calendar.HOUR_OF_DAY,1);
             }

@@ -2,10 +2,7 @@ package com.unizar.major.application.dtos;
 
 
 import com.unizar.major.domain.Period;
-import com.unizar.major.domain.Space;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -90,9 +87,7 @@ public class BookingDto {
     public List<Integer> getSpaces() {
         return spaces;
     }
-
-   // public void setSpaces(Collection<Integer> spaces) { this.spaces = new ArrayList<>(spaces);    }
-
+    
     public void setSpaces(List<Integer> spaces) {
         this.spaces = spaces;
     }

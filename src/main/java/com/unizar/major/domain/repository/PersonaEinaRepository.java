@@ -1,6 +1,6 @@
 package com.unizar.major.domain.repository;
 
-import com.unizar.major.domain.User;
+import com.unizar.major.domain.PersonaEina;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,18 +10,18 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, String> {
+public interface PersonaEinaRepository extends JpaRepository<PersonaEina, String> {
 
     @Query(value = "SELECT * FROM personeina WHERE active", nativeQuery = true)
-    List<User> findAll();
+    List<PersonaEina> findAll();
 
     @Query(value = "SELECT * FROM personeina WHERE iduser = :id AND active", nativeQuery = true)
-    Optional<User> findById(@Param("id") Long id);
+    Optional<PersonaEina> findById(@Param("id") Long id);
 
     @Query(value = "SELECT * FROM personeina WHERE nombreusuario = :nameUser AND active", nativeQuery = true)
-    Optional<User> findByUserName(@Param("nameUser") String nameUser);
+    Optional<PersonaEina> findByUserName(@Param("nameUser") String nameUser);
 
     @Query(value = "SELECT * FROM personeina WHERE email = :email AND active", nativeQuery = true)
-    Optional<User> findByEmail(@Param("email") String email);
+    Optional<PersonaEina> findByEmail(@Param("email") String email);
 
 }

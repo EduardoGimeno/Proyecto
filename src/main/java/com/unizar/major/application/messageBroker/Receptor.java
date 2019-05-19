@@ -8,11 +8,11 @@ import com.rabbitmq.client.QueueingConsumer;
 import com.unizar.major.application.dtos.*;
 import com.unizar.major.application.service.BookingService;
 import com.unizar.major.application.service.EmailService;
+import com.unizar.major.application.service.PersonaEinaService;
 import com.unizar.major.application.service.SpaceService;
-import com.unizar.major.application.service.UserService;
 import com.unizar.major.domain.Booking;
+import com.unizar.major.domain.PersonaEina;
 import com.unizar.major.domain.Space;
-import com.unizar.major.domain.User;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +55,7 @@ public class Receptor implements CommandLineRunner {
     BookingService bookingService;
 
     @Autowired
-    UserService userService;
+    PersonaEinaService personaEinaService;
 
     @Autowired
     SpaceService spaceService;
@@ -237,10 +237,10 @@ public class Receptor implements CommandLineRunner {
     private String login(String message) {
         logger.info("login message received{" + message + "}");
         try {
-            Optional logUser = userService.loginUser(new ObjectMapper().readValue(message, LoginDto.class));
+            Optional logUser = personaEinaService.loginUser(new ObjectMapper().readValue(message, LoginDto.class));
 
             if (logUser.isPresent()) {
-                return "200;" + UUID.randomUUID().toString() + "::" + ((User) logUser.get()).getRol() + "::" + ((User) logUser.get()).getId();
+                return "200;" + UUID.randomUUID().toString() + "::" + ((PersonaEina) logUser.get()).getRol() + "::" + ((PersonaEina) logUser.get()).getId();
             }
             return "401;null";
         } catch (IOException e) {
@@ -252,9 +252,9 @@ public class Receptor implements CommandLineRunner {
     private String createNewUser(String message) {
         logger.info("createNewUser message received{" + message + "}");
         try {
-            UserDto inUserDto = new ObjectMapper().readValue(message, UserDto.class);
-            if (!userService.existsUserInSystem(inUserDto)) {
-                Boolean status = userService.createUser(inUserDto);
+            PersonaEinaDto inPersonaEinaDto = new ObjectMapper().readValue(message, PersonaEinaDto.class);
+            if (!personaEinaService.existsUserInSystem(inPersonaEinaDto)) {
+                Boolean status = personaEinaService.createUser(inPersonaEinaDto);
                 return (status ? "201;null" : "500;null");
             }
             return "409;null";
@@ -268,10 +268,10 @@ public class Receptor implements CommandLineRunner {
         logger.info("fetchUserByID message received{" + message + "}");
 
         try {
-            Optional fetchedUser = userService.getUser(Long.parseLong(message));
+            Optional fetchedUser = personaEinaService.getUser(Long.parseLong(message));
             if (fetchedUser.isPresent()) {
-                ((User) fetchedUser.get()).setPassword(null);
-                return "200;" + new ObjectMapper().writeValueAsString(new ModelMapper().map(fetchedUser.get(), UserDto.class));
+                ((PersonaEina) fetchedUser.get()).setPassword(null);
+                return "200;" + new ObjectMapper().writeValueAsString(new ModelMapper().map(fetchedUser.get(), PersonaEinaDto.class));
             }
             return "404;null";
         } catch (Exception e) {
@@ -283,7 +283,7 @@ public class Receptor implements CommandLineRunner {
     private String deleteUserByID(String message) {
         logger.info("deleteUserByID message received{" + message + "}");
         try {
-            Boolean status = userService.deleteUser(Long.parseLong(message));
+            Boolean status = personaEinaService.deleteUser(Long.parseLong(message));
             return (status ? "202;null" : "404;null");
         } catch (Exception e) {
             logger.error("deleteUserByID", e);
@@ -295,7 +295,7 @@ public class Receptor implements CommandLineRunner {
         logger.info("updateUserByID message received{" + message + "}");
         String[] args = message.split("::");
         try {
-            Boolean status = userService.updateUser(Long.parseLong(args[0]), new ObjectMapper().readValue(args[1], UserDto.class));
+            Boolean status = personaEinaService.updateUser(Long.parseLong(args[0]), new ObjectMapper().readValue(args[1], PersonaEinaDto.class));
             return (status ? "202;null" : "404;null");
         } catch (Exception e) {
             logger.error("deleteUserByID", e);
@@ -306,7 +306,7 @@ public class Receptor implements CommandLineRunner {
     private String fetchUserBookingsByID(String message) {
         logger.info("fetchUserBookingsByID message received{" + message + "}");
         try {
-            List<Booking> bookings = userService.getBookings(Long.parseLong(message));
+            List<Booking> bookings = personaEinaService.getBookings(Long.parseLong(message));
             if(bookings == null) {
                 return "404;null";
             }
@@ -419,7 +419,7 @@ public class Receptor implements CommandLineRunner {
             if(booking.isPresent()) {
                 long userID = bookingService.getBookingOwnerByID(booking.get().getId());
                 if( userID != -1) {
-                    Optional<User> user = userService.getUser(userID);
+                    Optional<PersonaEina> user = personaEinaService.getUser(userID);
                     if(user.isPresent()) {
                         emailService.sendSimpleEmail(user.get().getEmail(), "Reserva confirmada", "La siguiente reserva acaba de ser confirmada" + new ObjectMapper().writeValueAsString(convertBookingIntoDto(booking.get())));
                         return "200;null";
@@ -440,7 +440,7 @@ public class Receptor implements CommandLineRunner {
             if(booking.isPresent()) {
                 long userID = bookingService.getBookingOwnerByID(booking.get().getId());
                 if (userID != -1) {
-                    Optional<User> user = userService.getUser(userID);
+                    Optional<PersonaEina> user = personaEinaService.getUser(userID);
                     if (user.isPresent()) {
                         emailService.sendSimpleEmail(user.get().getEmail(), "Reserva Denegada", "La siguiente reserva acaba de ser denegada" + new ObjectMapper().writeValueAsString(convertBookingIntoDto(booking.get())));
                         return "200;null";
@@ -458,7 +458,7 @@ public class Receptor implements CommandLineRunner {
         logger.info("createCSVBooking message received{" + message + "}");
         String[] args = message.split("::");
         try {
-            Boolean status = bookingService.createNewBooking(Long.parseLong(args[0]), new ObjectMapper().readValue(args[1], Bookingcsv.class));
+            Boolean status = bookingService.createNewBooking(Long.parseLong(args[0]), new ObjectMapper().readValue(args[1], BookingCsv.class));
             return (status ? "201;null" : "404;null");
         } catch (Exception e) {
             logger.error("createCSVBooking", e);
@@ -542,11 +542,11 @@ public class Receptor implements CommandLineRunner {
         }
     }
 
-    public String fetchSpaceCalendar(String message){
+    private String fetchSpaceCalendar(String message){
         logger.info("fetchSpaceCalendar message received{" + message + "}");
         try{
-            List<SpaceHorarioDto> horario = spaceService.getCalendarSpace(Integer.parseInt(message));
-            return "200;" + new ObjectMapper().writeValueAsString(horario);
+            List<SpaceTimetableDto> timeTable = spaceService.getCalendarSpace(Integer.parseInt(message));
+            return "200;" + new ObjectMapper().writeValueAsString(timeTable);
         }catch (Exception e){
             logger.error("fetchSpaceCalendar",e);
             return "500,null";

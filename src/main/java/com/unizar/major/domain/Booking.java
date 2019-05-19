@@ -5,9 +5,10 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
-
 import javax.persistence.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "booking")
@@ -27,8 +28,7 @@ public class Booking {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "iduser")
     @JsonBackReference
-    private User user;
-
+    private PersonaEina personaEina;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name="Booking_Period", joinColumns = @JoinColumn(name="id_booking"))
@@ -84,13 +84,13 @@ public class Booking {
     }
 
 
-    public User getUser(){
-        return user;
+    public PersonaEina getPersonaEina(){
+        return personaEina;
     }
-    public void setUser(User user){
-        this.user=user;
-        if(!user.getBookings().contains(this)){
-            user.setBookings(this);
+    public void setPersonaEina(PersonaEina personaEina){
+        this.personaEina = personaEina;
+        if(!personaEina.getBookings().contains(this)){
+            personaEina.setBookings(this);
         }
     }
 
@@ -165,7 +165,7 @@ public class Booking {
     public void setSpaces(Space space) {
         this.spaces.add(space);
         if(!space.getBookings().contains(this)){
-            user.setBookings(this);
+            personaEina.setBookings(this);
         }
 
     }

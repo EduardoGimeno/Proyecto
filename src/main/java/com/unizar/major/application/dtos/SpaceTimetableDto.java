@@ -2,10 +2,10 @@ package com.unizar.major.application.dtos;
 
 import com.unizar.major.domain.Period;
 
-public class SpaceHorarioDto {
+public class SpaceTimetableDto {
 
-    Period period;
-    String state;
+    private Period period;
+    private String state;
 
     public Period getPeriod() {
         return period;

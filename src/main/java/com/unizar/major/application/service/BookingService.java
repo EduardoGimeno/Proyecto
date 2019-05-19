@@ -1,14 +1,14 @@
 package com.unizar.major.application.service;
 
+import com.unizar.major.application.dtos.BookingCsv;
 import com.unizar.major.application.dtos.BookingDto;
-import com.unizar.major.application.dtos.Bookingcsv;
 import com.unizar.major.domain.Booking;
 import com.unizar.major.domain.Period;
+import com.unizar.major.domain.PersonaEina;
 import com.unizar.major.domain.Space;
-import com.unizar.major.domain.User;
 import com.unizar.major.domain.repository.BookingRepository;
+import com.unizar.major.domain.repository.PersonaEinaRepository;
 import com.unizar.major.domain.repository.SpaceRepository;
-import com.unizar.major.domain.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ import java.util.*;
 public class BookingService {
 
     @Autowired
-    private UserRepository userRepository;
+    private PersonaEinaRepository personaEinaRepository;
 
     @Autowired
     private BookingRepository bookingRepository;
@@ -36,12 +36,12 @@ public class BookingService {
     }
 
     @Transactional
-    public Boolean createNewBooking(Long id, Bookingcsv bookingcsv) {
-        Optional<User> user = userRepository.findById(id);
+    public Boolean createNewBooking(Long id, BookingCsv bookingcsv) {
+        Optional<PersonaEina> user = personaEinaRepository.findById(id);
         if (user.isPresent()) {
-            User u = user.get();
+            PersonaEina u = user.get();
             Booking booking = new Booking(false, bookingcsv.getReason(), bookingcsv.getPeriods());
-            booking.setUser(u);
+            booking.setPersonaEina(u);
             booking.setState("valida");
             for (int i : bookingcsv.getSpaces()) {
                 Optional<Space> space = spaceRepository.findByGid(i);
@@ -55,10 +55,10 @@ public class BookingService {
 
     @Transactional
     public Boolean createNewBooking(Long id, BookingDto bookingDto) {
-        Optional<User> user = userRepository.findById(id);
+        Optional<PersonaEina> user = personaEinaRepository.findById(id);
         if (user.isPresent()) {
-            if (cumplePolitica(bookingDto,user.get().getRol())){
-                User u = user.get();
+            if (keepPolicy(bookingDto,user.get().getRol())){
+                PersonaEina u = user.get();
 
                 Period period = new Period(bookingDto.getPeriod().getstartDate(), bookingDto.getPeriod().getEndDate());
                 List<Period> p = new ArrayList<>();
@@ -70,7 +70,7 @@ public class BookingService {
                 booking.setFinalDate(null);
                 booking.setPeriodRep(null);
                 booking.setEspecial(bookingDto.isEspecial());
-                booking.setUser(u);
+                booking.setPersonaEina(u);
 
                 for (int i = 0; i < bookingDto.getSpaces().size(); i++) {
                     Optional<Space> space = spaceRepository.findByGid(bookingDto.getSpaces().get(i));
@@ -96,24 +96,23 @@ public class BookingService {
 
     @Transactional
     public Boolean createNewPeriodicBooking(Long id, BookingDto bookingDto) {
-        Optional<User> user = userRepository.findById(id);
-        List<Space> spaces = new ArrayList<>();
+        Optional<PersonaEina> user = personaEinaRepository.findById(id);
         if (user.isPresent()) {
-            if (cumplePolitica(bookingDto,user.get().getRol())) {
-                User u = user.get();
+            if (keepPolicy(bookingDto,user.get().getRol())) {
+                PersonaEina u = user.get();
                 List<Period> p = calculatePeriods(bookingDto.getPeriodRep(), bookingDto.getFinalDate(), bookingDto.getPeriod().getstartDate(), bookingDto.getPeriod().getEndDate());
                 Booking booking = new Booking(bookingDto.isIsPeriodic(), bookingDto.getReason(), p, bookingDto.getPeriodRep(), bookingDto.getFinalDate());
                 booking.setActive(true);
                 booking.setState("inicial");
-                booking.setUser(u);
+                booking.setPersonaEina(u);
                 booking.setEspecial(bookingDto.isEspecial());
 
                 for (int i = 0; i < bookingDto.getSpaces().size(); i++) {
                     Optional<Space> space = spaceRepository.findByGid(bookingDto.getSpaces().get(i));
-                    booking.setSpaces(space.get());
+                    space.ifPresent(booking::setSpaces);
                 }
 
-                if (u.getRol() == User.Rol.ADMIN) {
+                if (u.getRol() == PersonaEina.Rol.ADMIN) {
                     booking.setEspecial(bookingDto.isEspecial());
                 } else {
                     booking.setEspecial(false);
@@ -129,45 +128,45 @@ public class BookingService {
         return false;
     }
 
-    public boolean cumplePolitica(BookingDto bookingDto, User.Rol user_rol) {
+    private boolean keepPolicy(BookingDto bookingDto, PersonaEina.Rol user_rol) {
 
-        boolean cumplePolitica = true;
+        boolean keepPolicy = true;
 
-        Calendar fecha_ini= Calendar.getInstance();
-        fecha_ini.setTime(bookingDto.getPeriod().getstartDate());
+        Calendar initialDate= Calendar.getInstance();
+        initialDate.setTime(bookingDto.getPeriod().getstartDate());
 
-        Calendar fecha_fin = Calendar.getInstance();
-        fecha_fin.setTime(bookingDto.getPeriod().getEndDate());
+        Calendar endDate = Calendar.getInstance();
+        endDate.setTime(bookingDto.getPeriod().getEndDate());
 
-        Calendar calendar_mes = Calendar.getInstance();
-        calendar_mes.add(Calendar.MONTH, 1);
+        Calendar calendarMonth = Calendar.getInstance();
+        calendarMonth.add(Calendar.MONTH, 1);
 
-        Calendar calendar_semana = Calendar.getInstance();
-        calendar_semana.add(Calendar.DATE, 7);
+        Calendar calendarWeek = Calendar.getInstance();
+        calendarWeek.add(Calendar.DATE, 7);
 
         Calendar hoy = Calendar.getInstance();
 
-        if (fecha_ini.after(hoy)){
+        if (initialDate.after(hoy)){
 
-            if (user_rol==User.Rol.PDI) {
+            if (user_rol== PersonaEina.Rol.PDI) {
                 if (bookingDto.isIsPeriodic()){
-                    if (fecha_ini.after(calendar_mes)) {
-                        cumplePolitica = false;
+                    if (initialDate.after(calendarMonth)) {
+                        keepPolicy = false;
                     }
                 }
                 else{
-                    if (fecha_ini.after(calendar_mes) || fecha_fin.after(calendar_mes)) {
-                        cumplePolitica = false;
+                    if (initialDate.after(calendarMonth) || endDate.after(calendarMonth)) {
+                        keepPolicy = false;
                     }
                 }
             }
-            else if (user_rol==User.Rol.ESTUDIANTE){
-                if(fecha_ini.after(calendar_semana) || fecha_fin.after(calendar_semana)){
-                    cumplePolitica =false;
+            else if (user_rol== PersonaEina.Rol.ESTUDIANTE){
+                if(initialDate.after(calendarWeek) || endDate.after(calendarWeek)){
+                    keepPolicy =false;
                 }
             }
 
-            if (cumplePolitica) {
+            if (keepPolicy) {
 
                 for (int i = 0; i < bookingDto.getSpaces().size(); i++) {
                     Optional<Space> space = spaceRepository.findByGid(bookingDto.getSpaces().get(i));
@@ -175,8 +174,7 @@ public class BookingService {
 
                     if (!bookings.isEmpty()) {
 
-                        for (int j = 0; j < bookings.size(); j++) {
-                            Booking booking = bookings.get(j);
+                        for (Booking booking : bookings) {
                             if (booking.isActive()) {
                                 Collection<Period> p = booking.getPeriod();
                                 for (int k = 0; k < p.size(); k++) {
@@ -185,34 +183,34 @@ public class BookingService {
                                     Calendar fin = Calendar.getInstance();
                                     fin.setTime(booking.getPeriod().get(k).getEndDate());
 
-                                    if (ini.equals(fecha_ini)) {
-                                        cumplePolitica = false;
-                                    } else if (fecha_ini.after(ini) && fecha_fin.before(fin)) {
-                                        cumplePolitica = false;
-                                    } else if (fecha_fin.after(ini) && fecha_fin.before(fin)) {
-                                        cumplePolitica = false;
-                                    } else if (fecha_ini.after(ini) && fecha_ini.before(fin)) {
-                                        cumplePolitica = false;
-                                    } else if (fin.equals(fecha_fin)) {
-                                        cumplePolitica = false;
-                                    } else if (fecha_ini.before(ini) && fecha_fin.after(fin)) {
-                                        cumplePolitica = false;
+                                    if (ini.equals(initialDate)) {
+                                        keepPolicy = false;
+                                    } else if (initialDate.after(ini) && endDate.before(fin)) {
+                                        keepPolicy = false;
+                                    } else if (endDate.after(ini) && endDate.before(fin)) {
+                                        keepPolicy = false;
+                                    } else if (initialDate.after(ini) && initialDate.before(fin)) {
+                                        keepPolicy = false;
+                                    } else if (fin.equals(endDate)) {
+                                        keepPolicy = false;
+                                    } else if (initialDate.before(ini) && endDate.after(fin)) {
+                                        keepPolicy = false;
                                     }
 
                                 }
                             }
                         }
                     } else {
-                        cumplePolitica = true;
+                        keepPolicy = true;
                     }
                 }
             }
 
         } else{
-            cumplePolitica =false;
+            keepPolicy =false;
         }
 
-        return cumplePolitica;
+        return keepPolicy;
 
     }
 
@@ -416,11 +414,11 @@ public class BookingService {
 
     public long getBookingOwnerByID (long id) {
         Optional<Booking> booking = bookingRepository.findById(id);
-        return (booking.isPresent() ? booking.get().getUser().getId() : -1 );
+        return (booking.isPresent() ? booking.get().getPersonaEina().getId() : -1 );
     }
 
-    public User getBookingUserByID(long id) {
+    public PersonaEina getBookingUserByID(long id) {
         Optional<Booking> booking = bookingRepository.findById(id);
-        return (booking.isPresent() ? booking.get().getUser() : null);
+        return (booking.isPresent() ? booking.get().getPersonaEina() : null);
     }
 }

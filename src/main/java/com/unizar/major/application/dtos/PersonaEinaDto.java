@@ -2,12 +2,11 @@ package com.unizar.major.application.dtos;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.unizar.major.domain.Booking;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserDto {
+public class PersonaEinaDto {
 
     @SuppressWarnings("SpellCheckingInspection")
     public enum Rol {
@@ -21,7 +20,7 @@ public class UserDto {
     private String userName;
     private String email;
     private String password;
-    //@JsonIgnore private List<Booking> bookings;
+    @JsonIgnore private List<BookingDtoReturn> bookings;
 
     public long getId() {
         return id;
@@ -75,13 +74,13 @@ public class UserDto {
         this.userName = userName;
     }
 
-    /*public List<Booking> getBookings() {
+    public List<BookingDtoReturn> getBookings() {
         return bookings;
     }
-    public void setBookings(List<Booking> bookings) {
+    public void setBookings(List<BookingDtoReturn> bookings) {
         this.bookings = bookings;
     }
-*/
+
     public String getEmail() {
         return email;
     }

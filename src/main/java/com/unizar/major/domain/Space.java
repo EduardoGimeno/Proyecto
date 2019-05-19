@@ -9,7 +9,6 @@ import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-
 import java.util.List;
 
 @Entity
@@ -17,6 +16,7 @@ import java.util.List;
 public class Space {
 
     private String id;
+
     @Id
     private int gid;
     private String layer;

@@ -8,7 +8,7 @@ import java.util.List;
 
 @Entity
 @Table (name = "personEina")
-public class User{
+public class PersonaEina {
 
     public enum Rol {
         ESTUDIANTE, PDI, ADMIN
@@ -35,7 +35,7 @@ public class User{
     @Column(name="email")
     private String email;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "personaEina", fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<Booking> bookings;
 
@@ -46,11 +46,11 @@ public class User{
     private String password;
 
 
-    public User(){
+    public PersonaEina(){
 
     }
 
-    public User(String firstName, String lastName, Rol rol, String nameuser, String email, String password){
+    public PersonaEina(String firstName, String lastName, Rol rol, String nameuser, String email, String password){
         this.firstName=firstName;
         this.lastName = lastName;
         this.rol = rol;
@@ -59,7 +59,7 @@ public class User{
         this.password = password;
     }
 
-    public User(String firstName, String lastName, String rol, String nameuser, String email, String password){
+    public PersonaEina(String firstName, String lastName, String rol, String nameuser, String email, String password){
         this.firstName=firstName;
         this.lastName = lastName;
         this.rol = Rol.valueOf(rol.toUpperCase());
@@ -73,8 +73,8 @@ public class User{
     }
 
     public void setBookings(Booking booking){
-        if (booking.getUser()==null){
-            booking.setUser(this);
+        if (booking.getPersonaEina()==null){
+            booking.setPersonaEina(this);
         }
         if(!this.bookings.contains(booking)){
             this.bookings.add(booking);
