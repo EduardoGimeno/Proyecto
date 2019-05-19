@@ -170,6 +170,9 @@ public class BookingService {
 
                 for (int i = 0; i < bookingDto.getSpaces().size(); i++) {
                     Optional<Space> space = spaceRepository.findByGid(bookingDto.getSpaces().get(i));
+                    if(!space.isPresent()) {
+                        return false;
+                    }
                     List<Booking> bookings = space.get().getBookings();
 
                     if (!bookings.isEmpty()) {

@@ -56,18 +56,14 @@ public class SpaceService {
         }
     }
 
-    public boolean cumplePolitica(SpaceInfoDto spaceInfoDto, double area) {
+    private boolean cumplePolitica(SpaceInfoDto spaceInfoDto, double area) {
         double area_m2 = area / 10000;
-        double espacio_sillas = spaceInfoDto.getSillas() * 0.5;
-        double espacio_mesas = spaceInfoDto.getMesas() * 2;
-        double espacio_libre = (area_m2 * 10) / 100;
-        double area_restante = area_m2 - espacio_libre - espacio_mesas - espacio_sillas;
+        double chairSpace = spaceInfoDto.getSillas() * 0.5;
+        double tableSpace = (double) (spaceInfoDto.getMesas() * 2);
+        double freeSpace = (area_m2 * 10) / 100;
+        double remainArea = area_m2 - freeSpace - tableSpace - chairSpace;
 
-        if (area_restante >= 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return remainArea >= 0;
     }
 
     public Optional<Space> getSpaceByCoords(int floor, double X, double Y) {
@@ -75,7 +71,7 @@ public class SpaceService {
     }
 
     public List<Space> getSpacesQuery(int chairs, double area) {
-        area = area * 10000; // converto to cm²
+        area = area * 10000; // convert to to cm²
         if (chairs == 0) {
             // SEARCH ONLY AREA
             return spaceRepository.findByArea(area);
@@ -90,41 +86,42 @@ public class SpaceService {
 
     public List<SpaceTimetableDto> getCalendarSpace(int id) {
 
-        String estado = "libre";
-        List<SpaceTimetableDto> horarios = new ArrayList<>();
+        String state;
+        List<SpaceTimetableDto> timetable = new ArrayList<>();
         Optional<Space> space = spaceRepository.findByGid(id);
+        if(!space.isPresent()) {
+            return timetable;
+        }
+
         List<Booking> bookings = space.get().getBookings();
 
-        Calendar fecha_ini = Calendar.getInstance(TimeZone.getTimeZone("GTM"));
-        Calendar fecha_fin = Calendar.getInstance(TimeZone.getTimeZone("GTM"));
+        Calendar initDate = Calendar.getInstance(TimeZone.getTimeZone("GTM"));
+        Calendar endDate = Calendar.getInstance(TimeZone.getTimeZone("GTM"));
 
-        int ano = 0;
-        int mes = 0;
-        int dia = 0;
+        int year, month, day;
 
-        Calendar calendar_semana = Calendar.getInstance(TimeZone.getTimeZone("GTM"));
-        calendar_semana.add(Calendar.DATE, 8);
+        Calendar weekCalendar = Calendar.getInstance(TimeZone.getTimeZone("GTM"));
+        weekCalendar.add(Calendar.DATE, 8);
         Calendar calendar_hora = Calendar.getInstance(TimeZone.getTimeZone("GTM"));
 
-        for (int r=0; fecha_ini.before(calendar_semana);r++){
-            ano = fecha_ini.get(Calendar.YEAR);
-            mes = fecha_ini.get(Calendar.MONTH);
-            dia = fecha_ini.get(Calendar.DATE);
-            fecha_ini.set(ano, mes, dia, 8, 0);
-            fecha_fin.set(ano, mes, dia, 9, 0);
+        while(initDate.before(weekCalendar)){
+            year = initDate.get(Calendar.YEAR);
+            month = initDate.get(Calendar.MONTH);
+            day = initDate.get(Calendar.DATE);
+            initDate.set(year, month, day, 8, 0);
+            endDate.set(year, month, day, 9, 0);
 
-            calendar_hora.set(ano,mes,dia,20,0);
+            calendar_hora.set(year,month,day,20,0);
 
-            for (int i = 0; fecha_ini.before(calendar_hora); i++){
-                estado = "libre";
+            while(initDate.before(calendar_hora)){
+                state = "libre";
                 SpaceTimetableDto spaceTimetableDto = new SpaceTimetableDto();
-                Period period = new Period(fecha_ini.getTime(), fecha_fin.getTime());
+                Period period = new Period(initDate.getTime(), endDate.getTime());
                 spaceTimetableDto.setPeriod(period);
 
                 if (!bookings.isEmpty()) {
 
-                    for (int j = 0; j < bookings.size(); j++) {
-                        Booking booking = bookings.get(j);
+                    for (Booking booking : bookings) {
                         if (booking.isActive()) {
                             Collection<Period> p = booking.getPeriod();
                             for (int k = 0; k < p.size(); k++) {
@@ -133,40 +130,40 @@ public class SpaceService {
                                 Calendar fin = Calendar.getInstance();
                                 fin.setTime(booking.getPeriod().get(k).getEndDate());
 
-                                if (ini.equals(fecha_ini)) {
-                                    estado = "ocupado";
-                                } else if (fecha_ini.after(ini) && fecha_fin.before(fin)) {
-                                    estado = "ocupado";
-                                } else if (fecha_ini.after(ini) && fecha_ini.before(fin)) {
-                                    estado = "ocupado";
-                                } else if (fin.equals(fecha_fin)) {
-                                    estado = "ocupado";
-                                } else if (fecha_ini.before(ini) && fecha_fin.after(fin)) {
-                                    estado = "ocupado";
+                                if (ini.equals(initDate)) {
+                                    state = "ocupado";
+                                } else if (initDate.after(ini) && endDate.before(fin)) {
+                                    state = "ocupado";
+                                } else if (initDate.after(ini) && initDate.before(fin)) {
+                                    state = "ocupado";
+                                } else if (fin.equals(endDate)) {
+                                    state = "ocupado";
+                                } else if (initDate.before(ini) && endDate.after(fin)) {
+                                    state = "ocupado";
                                 }
 
-                                if (estado.compareTo("ocupado") == 0 && booking.isEspecial()) {
-                                    estado = "no reservable";
+                                if (state.compareTo("ocupado") == 0 && booking.isEspecial()) {
+                                    state = "no reservable";
                                 }
                             }
                         } else {
-                            estado = "libre";
+                            state = "libre";
                         }
 
                     }
 
                 } else{
-                    estado="libre";
+                    state="libre";
                 }
-                spaceTimetableDto.setState(estado);
-                horarios.add(spaceTimetableDto);
-                fecha_ini.add(Calendar.HOUR_OF_DAY,1);
-                fecha_fin.add(Calendar.HOUR_OF_DAY,1);
+                spaceTimetableDto.setState(state);
+                timetable.add(spaceTimetableDto);
+                initDate.add(Calendar.HOUR_OF_DAY,1);
+                endDate.add(Calendar.HOUR_OF_DAY,1);
             }
-            fecha_ini.add(Calendar.DATE,1);
-            fecha_fin.add(Calendar.DATE,1);
+            initDate.add(Calendar.DATE,1);
+            endDate.add(Calendar.DATE,1);
         }
 
-        return horarios;
+        return timetable;
     }
 }
