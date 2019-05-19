@@ -78,7 +78,6 @@ public class SpaceService {
             return spaceRepository.findByChairs(chairs);
         }
         // SEARCH BOTH
-
         return spaceRepository.findByChairsAndArea(chairs, area);
     }
 
@@ -128,19 +127,16 @@ public class SpaceService {
                                 Calendar fin = Calendar.getInstance();
                                 fin.setTime(booking.getPeriod().get(k).getEndDate());
 
-                                if (ini.equals(initDate)) {
-                                    state = "ocupado";
-                                } else if (initDate.after(ini) && endDate.before(fin)) {
-                                    state = "ocupado";
-                                } else if (initDate.after(ini) && initDate.before(fin)) {
-                                    state = "ocupado";
-                                } else if (fin.equals(endDate)) {
-                                    state = "ocupado";
-                                } else if (initDate.before(ini) && endDate.after(fin)) {
+                                if (ini.equals(initDate) ||
+                                        (initDate.after(ini) && endDate.before(fin)) ||
+                                        (initDate.after(ini) && initDate.before(fin)) ||
+                                        fin.equals(endDate) ||
+                                        (initDate.before(ini) && endDate.after(fin))) {
+
                                     state = "ocupado";
                                 }
 
-                                if (state.compareTo("ocupado") == 0 && booking.isEspecial()) {
+                                if (state.equalsIgnoreCase("ocupado") && booking.isEspecial()) {
                                     state = "no reservable";
                                 }
                             }
