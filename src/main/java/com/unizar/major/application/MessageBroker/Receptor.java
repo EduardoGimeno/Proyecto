@@ -1,4 +1,4 @@
-package com.unizar.major.application.messageBroker;
+package com.unizar.major.application.MessageBroker;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
@@ -35,21 +35,21 @@ import java.util.UUID;
 public class Receptor implements CommandLineRunner {
 
     @Value("${app.messageBroker.default-requests-queue:}")
-    private String REQUEST_QUEUE;
+    private String requestQueue;
 
     @Value("${app.messageBroker.default-responses-queue:}")
-    private String RESPONSE_QUEUE;
+    private String responseQueue;
 
     private static Logger logger = LoggerFactory.getLogger(Receptor.class);
 
     @Value("${app.messageBroker.user:}")
-    private String USER;
+    private String user;
 
     @Value("${app.messageBroker.password:}")
-    private String PASSWORD;
+    private String password;
 
     @Value("${app.messageBroker.amqp-url:}")
-    private String AMQP_URL;
+    private String amqpUrl;
 
     @Autowired
     BookingService bookingService;
@@ -71,10 +71,10 @@ public class Receptor implements CommandLineRunner {
 
 
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setUsername(USER);
-        factory.setPassword(PASSWORD);
+        factory.setUsername(user);
+        factory.setPassword(password);
 
-        String amqpURL = AMQP_URL;
+        String amqpURL = amqpUrl;
 
         try {
             factory.setUri(amqpURL);
@@ -87,12 +87,12 @@ public class Receptor implements CommandLineRunner {
         Connection connection = factory.newConnection();
 
         channel = connection.createChannel();
-        channel.queueDeclare(REQUEST_QUEUE, false, false, false, null);
-        channel.queueDeclare(RESPONSE_QUEUE, false, false, false, null);
+        channel.queueDeclare(requestQueue, false, false, false, null);
+        channel.queueDeclare(responseQueue, false, false, false, null);
         consumer = new QueueingConsumer(channel);
 
 
-        channel.basicConsume(REQUEST_QUEUE, true, consumer);
+        channel.basicConsume(requestQueue, true, consumer);
 
         boolean loopState = true;
         while (loopState) {
@@ -301,7 +301,7 @@ public class Receptor implements CommandLineRunner {
             Boolean status = personaEinaService.updateUser(Long.parseLong(args[0]), new ObjectMapper().readValue(args[1], PersonaEinaDto.class));
             return (status ? "202;null" : "404;null");
         } catch (Exception e) {
-            logger.error("deleteUserByID", e);
+            logger.error("updateUserByID", e);
             return "500;null";
         }
     }
